@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   // Pin the root to web/, or a lockfile higher up (e.g. in the home folder) moves server.js inside .next/standalone.
   outputFileTracingRoot: __dirname,
   poweredByHeader: false,
+  // 90 is for the sign-in hero (AuthCard); 75 stays the default for the rest.
+  images: { qualities: [75, 90] },
   async rewrites() {
     // Only for `next dev`: send /api to a Go server on :8080. In Docker, Caddy does this.
     return process.env.NODE_ENV === "development"

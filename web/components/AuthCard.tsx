@@ -22,7 +22,7 @@ export default function AuthCard({ title, children }: { title: string; children:
         </div>
       </div>
       <div className="relative m-3 hidden flex-1 overflow-hidden rounded-2xl lg:block">
-        <Image src={hero} alt="" fill preload placeholder="blur" sizes="50vw" className="object-cover" />
+        <Image src={hero} alt="" fill preload placeholder="blur" quality={90} sizes="50vw" className="object-cover" />
       </div>
     </main>
   );
