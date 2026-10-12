@@ -1,3 +1,5 @@
+![Zettra: the why behind every screen](docs/images/hero.jpg)
+
 # Zettra
 
 **The why behind every screen.** *Setiap layar punya alasan.*
