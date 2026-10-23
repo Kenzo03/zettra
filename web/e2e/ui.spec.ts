@@ -132,3 +132,22 @@ test("ticket page has no sideways scroll at 1440 and 375", async ({ page }) => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${width}px`).toBe(true);
   }
 });
+
+test("sign-in has no card and shows the tagline", async ({ page }) => {
+  await page.goto("/login");
+  await expect(page.getByRole("heading", { name: "Masuk ke Zettra" })).toBeVisible();
+  await expect(page.getByText("Alasan di balik setiap layar.")).toBeVisible();
+  await expect(page.getByText("Dihosting sendiri. Minta akun ke admin Anda.")).toBeVisible();
+
+  // No raised card, and nothing around the form carries a shadow.
+  await expect(page.locator(".surface-raised")).toHaveCount(0);
+  await expect(page.locator("form").locator("xpath=ancestor::*[contains(@class,'shadow-')]")).toHaveCount(0);
+
+  // On a phone it is one column with no picture, and nothing scrolls sideways.
+  await page.setViewportSize({ width: 375, height: 812 });
+  await expect(page.locator("main img")).toBeHidden();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+
+  // The shared helper still signs in through the same labels.
+  await start(page);
+});

@@ -14,6 +14,8 @@
   },
   "login": {
     "title": "Sign in to Zettra",
+    "tagline": "The why behind every screen.",
+    "footer": "Self-hosted. Ask your admin if you need an account.",
     "email": "Email",
     "password": "Password",
     "submit": "Sign in",

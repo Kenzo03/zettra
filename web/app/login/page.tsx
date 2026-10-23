@@ -12,7 +12,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   if (await getMe()) redirect(safeNext(next));
   const t = await getTranslations("login");
   return (
-    <AuthCard title={t("title")}>
+    <AuthCard title={t("title")} lead={t("tagline")} footer={t("footer")}>
       <LoginForm email={email} next={next} />
     </AuthCard>
   );

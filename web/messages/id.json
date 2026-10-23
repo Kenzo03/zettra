@@ -14,6 +14,8 @@
   },
   "login": {
     "title": "Masuk ke Zettra",
+    "tagline": "Alasan di balik setiap layar.",
+    "footer": "Dihosting sendiri. Minta akun ke admin Anda.",
     "email": "Email",
     "password": "Kata sandi",
     "submit": "Masuk",
