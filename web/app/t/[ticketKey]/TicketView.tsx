@@ -218,7 +218,8 @@ export default function TicketView({ ticket, statuses, clients, nodes, assignees
               {ticket.code && <Code code={ticket.code} />}
               {activity}
             </div>
-            <aside className="min-w-0">
+            {/* The rail keeps the space between its blocks but not the line (ticket-a-v8.html). */}
+            <aside className="min-w-0 [&>section]:border-t-0 [&>section]:pt-0">
               <section aria-label={t("people")} className={section}>
                 <dl className={rail.list}>
                   <div className={rail.row}>
