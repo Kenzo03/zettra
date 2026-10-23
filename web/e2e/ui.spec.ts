@@ -156,6 +156,7 @@ test("Home raises My tickets only", async ({ page }) => {
   const { ticket, call } = await start(page);
   const me = await call("GET", "/me");
   await ticket("Overtime approval skips the supervisor", { reason, assignee_id: me.id });
+  await ticket("Weekend overtime at double rate"); // no reason: the project shows under Needs attention
 
   await page.goto("/");
   const raised = page.locator(".surface-raised");
@@ -173,6 +174,11 @@ test("Home raises My tickets only", async ({ page }) => {
     if (name !== "Perlu perhatian") await expect(region).toBeVisible();
     for (const one of await region.all()) await expect(one.locator(".surface-raised")).toHaveCount(0);
   }
+
+  // Needs attention follows the Ask field with space, not a line.
+  const attention = page.getByRole("region", { name: "Perlu perhatian" });
+  await expect(attention).toHaveCSS("border-top-width", "0px");
+  await expect(attention).toHaveCSS("padding-top", "0px");
 });
 
 test("Home with no tickets keeps the raised list and its empty text", async ({ page, browser }) => {

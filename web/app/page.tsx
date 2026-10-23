@@ -147,7 +147,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
             </form>
             {/* MSL-9: a lead with nothing assigned still sees what is late, unowned or incomplete. */}
             {watch.length > 0 && (
-              <section aria-labelledby="attention-title" className={cx(section, "mb-7 min-w-0")}>
+              <section aria-labelledby="attention-title" className={cx(section, "mb-7 min-w-0 border-t-0! pt-0!")}>
                 <div className={head}>
                   <h2 id="attention-title" className={title}>{t("attention")}</h2>
                   <span className={hint}>{t("attentionHint")}</span>
