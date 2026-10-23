@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { api } from "@/lib/api";
 import type { components } from "@/lib/api-types";
 import { useProblemText } from "@/lib/problem";
-import { button, cx, field, panel, sectionTitle } from "@/lib/ui";
+import { button, cx, field, raised, section, sectionHeading, sectionTitle } from "@/lib/ui";
 
 type Run = components["schemas"]["ImportRun"];
 type Mapping = components["schemas"]["ImportMapping"];
@@ -61,8 +61,8 @@ export default function ImportDetail({ initial }: { initial: Run }) {
   const s = run.stats;
   const valid = s.create + s.update;
   return (
-    <>
-      <section aria-label={t("dryRun")} className={cx(panel, "grid gap-4 p-4 sm:grid-cols-5")}>
+    <div className="flex flex-col">
+      <section aria-label={t("dryRun")} className={cx(raised, "grid gap-4 px-6 py-5 sm:grid-cols-5")}>
         {([["status", t(`statuses.${run.status}`)], ["create", s.create], ["update", s.update], ["reject", s.reject], ["coverage", `${s.coverage}%`]] as const).map(([k, v]) => (
           <div key={k}>
             <h2 className={sectionTitle}>{t(`stats.${k}`)}</h2>
@@ -81,8 +81,8 @@ export default function ImportDetail({ initial }: { initial: Run }) {
         )}
       </section>
       {run.errors.length > 0 && (
-        <section aria-label={t("errors")} className={cx(panel, "flex flex-col gap-1 p-4 text-[13px]")}>
-          <h2 className={sectionTitle}>{t("errors")}</h2>
+        <section aria-label={t("errors")} className={cx(section, "text-[13px]")}>
+          <h2 className={sectionHeading}>{t("errors")}</h2>
           <ul className="flex flex-col gap-0.5 text-danger">
             {run.errors.map((e, i) => (
               <li key={i}>{t("row", { line: e.line })} {e.key ? <span className="font-mono">{e.key}</span> : null} {e.message}</li>
@@ -91,42 +91,44 @@ export default function ImportDetail({ initial }: { initial: Run }) {
         </section>
       )}
       {editable && (
-        <section aria-label={t("mapping")} className={cx(panel, "flex flex-col gap-3 p-4")}>
-          <h2 className={sectionTitle}>{t("mapping")}</h2>
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            {fields.map((f) => (
-              <label key={f} className={field.label}>
-                {t(`fields.${f}`)}
-                <select value={columns[f] ?? ""} onChange={(e) => setColumns({ ...columns, [f]: e.target.value })} className={field.compact}>
-                  <option value="">{t("none")}</option>
-                  {[...new Set(run.headers)].map((h) => (
-                    <option key={h} value={h}>{h}</option>
-                  ))}
-                </select>
-              </label>
-            ))}
+        <section aria-label={t("mapping")} className={section}>
+          <h2 className={sectionHeading}>{t("mapping")}</h2>
+          <div className="flex flex-col gap-3">
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {fields.map((f) => (
+                <label key={f} className={field.label}>
+                  {t(`fields.${f}`)}
+                  <select value={columns[f] ?? ""} onChange={(e) => setColumns({ ...columns, [f]: e.target.value })} className={field.compact}>
+                    <option value="">{t("none")}</option>
+                    {[...new Set(run.headers)].map((h) => (
+                      <option key={h} value={h}>{h}</option>
+                    ))}
+                  </select>
+                </label>
+              ))}
+            </div>
+            <label className={field.label}>
+              {t("values")}
+              <textarea value={values} onChange={(e) => setValues(e.target.value)} rows={8} className={cx(field.textarea, "font-mono text-xs")} />
+              <span className={field.hint}>{t("valuesHint")}</span>
+            </label>
+            {error && <p role="alert" className={field.error}>{error}</p>}
+            <div className="flex gap-2">
+              <button type="button" disabled={busy} onClick={plan} className={button.secondary}>{t("replan")}</button>
+              <button type="button" disabled={busy || run.status !== "dry_run" || valid === 0} onClick={start} className={button.primary}>
+                {t("run", { count: valid })}
+              </button>
+            </div>
+            <p className={field.hint}>{t("coverageHint")}</p>
           </div>
-          <label className={field.label}>
-            {t("values")}
-            <textarea value={values} onChange={(e) => setValues(e.target.value)} rows={8} className={cx(field.textarea, "font-mono text-xs")} />
-            <span className={field.hint}>{t("valuesHint")}</span>
-          </label>
-          {error && <p role="alert" className={field.error}>{error}</p>}
-          <div className="flex gap-2">
-            <button type="button" disabled={busy} onClick={plan} className={button.secondary}>{t("replan")}</button>
-            <button type="button" disabled={busy || run.status !== "dry_run" || valid === 0} onClick={start} className={button.primary}>
-              {t("run", { count: valid })}
-            </button>
-          </div>
-          <p className={field.hint}>{t("coverageHint")}</p>
         </section>
       )}
       {run.status === "done" && (
-        <p className="text-[13px]">
+        <p className="mt-4 text-[13px]">
           <Link href={`/p/${run.project_key}/tickets?missing=menus`}>{t("needsLinking")}</Link>
         </p>
       )}
-    </>
+    </div>
   );
 }
 

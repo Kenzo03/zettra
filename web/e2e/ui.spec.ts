@@ -43,15 +43,41 @@ async function start(page: Page) {
   const { key, node } = project;
   const ticket = (title: string, fields: object = {}): Promise<{ key: string }> =>
     call("POST", `/projects/${key}/tickets`, { type: "change_request", title, node_ids: [node], ...fields });
-  const attach = async (ticketKey: string, name: string) => {
-    const res = await page.request.post(`/api/v1/tickets/${ticketKey}/attachments`, {
-      multipart: { file: { name, mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", buffer: Buffer.from("PK-docx-bytes") } },
-      headers: { Origin: origin },
-    });
-    expect(res.ok(), `attach ${name}: ${res.status()}`).toBeTruthy();
+  const upload = async (path: string, multipart: Record<string, string | { name: string; mimeType: string; buffer: Buffer }>) => {
+    const res = await page.request.post(`/api/v1${path}`, { multipart, headers: { Origin: origin } });
+    expect(res.ok(), `POST ${path}: ${res.status()}`).toBeTruthy();
+    return res.json();
   };
-  return { ticket, attach, call, key, origin };
+  const attach = (ticketKey: string, name: string) =>
+    upload(`/tickets/${ticketKey}/attachments`, {
+      file: { name, mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", buffer: Buffer.from("PK-docx-bytes") },
+    });
+  const note = (title: string): Promise<{ key: string }> =>
+    call("POST", `/projects/${key}/notes`, { title, decided_on: "2025-05-08", attendees: "Agus Hartono, Rina Wijaya", node_ids: [node], body: "## Decision\n\nBumi gets a second approval." });
+  return { ticket, attach, upload, note, call, key, node, origin };
 }
+
+// Closes a ticket as Done through the close dialog, as a person would.
+async function closeDone(page: Page, ticketKey: string, whatChanged: string) {
+  await page.goto(`/t/${ticketKey}`);
+  await page.getByLabel(/^Status/).selectOption({ label: "Done" });
+  const dialog = page.getByRole("dialog", { name: `Tutup ${ticketKey} sebagai Done` });
+  await dialog.getByLabel("Apa yang berubah").fill(whatChanged);
+  await dialog.getByRole("button", { name: "Tutup tiket" }).click();
+  await expect(page.getByRole("region", { name: "Catatan keputusan" })).toBeVisible();
+}
+
+// Detail and list pages, each with the most and fewest raised cards it may show.
+// A path's {name} parts come from the sweep's setup. /summaries/{id} is left out:
+// writing a summary needs a model, and AI is off on the e2e stack.
+const routeSweep: { path: string; max: number; min?: number }[] = [
+  { path: "/notes/{note}", max: 1 },
+  { path: "/documents/{doc}", max: 1 },
+  { path: "/p/{key}/modules/{menu}", max: 1 },
+  { path: "/admin/ask-log/{query}", max: 1 },
+  { path: "/admin/imports/{import}", max: 1 },
+  { path: "/tree-drafts/{draft}", max: 1 },
+];
 
 test("open ticket raises the Reason and keeps every control", async ({ page }) => {
   const { ticket, attach } = await start(page);
@@ -203,6 +229,78 @@ test("Home with no tickets keeps the raised list and its empty text", async ({ p
   await expect(raised).toContainText("Tiket saya");
   await expect(raised).toContainText("Belum ada tiket yang ditugaskan kepada Anda.");
   await expect(raised.getByRole("link", { name: "Buka papan" })).toBeVisible();
+});
+
+test("sweep: every page raises at most one card", async ({ page }) => {
+  const { ticket, upload, note, call, key } = await start(page);
+  const run = Date.now().toString(36);
+  // A menu whose one closed ticket has a decision record, so its Timeline raises it.
+  const menu = await call("POST", `/projects/${key}/nodes`, { type: "menu", name: `Sweep menu ${run}` });
+  const closed = await ticket("Overtime approval skips the supervisor", { reason, node_ids: [menu.id] });
+  const done = (await call("GET", `/projects/${key}/statuses`)).items.find((s: { name: string }) => s.name === "Done");
+  await call("POST", `/tickets/${closed.key}/transition`, {
+    status_id: done.id, reason, node_ids: [menu.id],
+    decision: { what_changed: "Overtime approval skips the supervisor.", why: "Approvals stalled during leave periods.", alternatives: "" },
+  });
+  const markdown = "# Attendance\n\nEmployees clock in and out.\n\n## Overtime approval\n\nThe supervisor approves, then HR.\n";
+  const doc = await upload(`/projects/${key}/documents`, {
+    file: { name: "attendance-spec.md", mimeType: "text/markdown", buffer: Buffer.from(markdown) }, markdown, title: `Attendance spec ${run}`,
+  });
+  const draft = await call("POST", `/documents/${doc.key}/tree-drafts`); // AI off: drafted from the headings at once
+  const asked = await call("POST", "/ask", { question: `Siapa menyetujui lembur ${run}?` });
+  const jira = ["Summary,Issue key,Issue Type,Status,Reporter,Created", `Overtime export ${run},OLD-${run}-1,Story,To Do,Budi,12/Mar/24 2:05 PM`].join("\n");
+  const imported = await upload("/imports", { file: { name: "jira.csv", mimeType: "text/csv", buffer: Buffer.from(jira) }, project_key: key, preset: "jira" });
+  const ids: Record<string, string> = {
+    key, menu: String(menu.id), note: (await note(`Sweep note ${run}`)).key, doc: doc.key,
+    draft: String(draft.id), query: String(asked.query_id), import: String(imported.id),
+  };
+
+  for (const { path, max, min = max } of routeSweep) {
+    const url = path.replace(/\{(\w+)\}/g, (_, name: string) => ids[name]);
+    await page.goto(url);
+    await expect(page.locator("main"), url).toBeVisible();
+    const count = await page.locator(".surface-raised").count();
+    expect(count, `${url} raises ${count}`).toBeLessThanOrEqual(max);
+    expect(count, `${url} raises ${count}`).toBeGreaterThanOrEqual(min);
+  }
+});
+
+test("module page raises the newest decision only", async ({ page }) => {
+  const { ticket, call, key } = await start(page);
+  const name = `Overtime Request ${Date.now().toString(36)}`;
+  const menu = await call("POST", `/projects/${key}/nodes`, { type: "menu", name });
+  const older = await ticket("Overtime approval skips the supervisor", { reason, node_ids: [menu.id] });
+  const newer = await ticket("Weekend overtime at double rate", { reason, node_ids: [menu.id] });
+  await ticket("Overtime capped at forty hours", { reason, node_ids: [menu.id] }); // stays open
+
+  // No closed ticket yet, so nothing is raised.
+  await page.goto(`/p/${key}/modules/${menu.id}`);
+  await expect(page.getByRole("heading", { level: 1, name })).toBeVisible();
+  await expect(page.locator(".surface-raised")).toHaveCount(0);
+
+  await closeDone(page, older.key, "Overtime approval skips the supervisor when they are on leave.");
+  await closeDone(page, newer.key, "Weekend overtime pays double.");
+  await page.goto(`/p/${key}/modules/${menu.id}`);
+  const raised = page.locator(".surface-raised");
+  await expect(raised).toHaveCount(1);
+  await expect(raised).toContainText(newer.key);
+  await expect(raised).not.toContainText("Overtime approval skips the supervisor");
+
+  // The node name shows once: in the h1, not at the end of the breadcrumb.
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(name);
+  await expect(page.getByRole("navigation", { name: "Jejak" })).not.toContainText(name);
+});
+
+test("note page shows its key once", async ({ page }) => {
+  const { note } = await start(page);
+  const n = await note("Overtime approval flow for Bumi Logistik");
+
+  await page.goto(`/notes/${n.key}`);
+  await expect(page.getByRole("heading", { level: 1, name: "Overtime approval flow for Bumi Logistik" })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Lokasi" })).not.toContainText(n.key);
+  await expect(page.getByText(n.key, { exact: true })).toHaveCount(1);
+  await expect(page.locator(".surface-raised")).toHaveCount(1);
+  await expect(page.getByRole("region", { name: "Isi" })).toHaveClass(/surface-raised/);
 });
 
 test("answers are raised on the Ask page and flat in the panel", async ({ page }) => {

@@ -5,7 +5,7 @@ import { itemHref } from "@/lib/ask";
 import { asTables } from "@/lib/convert";
 import { dayOf } from "@/lib/format";
 import type { Behavior, TimelineSection } from "@/lib/problem";
-import { chip, cx, panel, sectionTitle } from "@/lib/ui";
+import { chip, cx, sectionTitle } from "@/lib/ui";
 
 // The Behaviors tab (FSD §7.4, story 5): the decisions in force, "All clients"
 // first, then each client in the user's scope, so QA checks what a client
@@ -33,9 +33,9 @@ export default async function Behaviors({ items, sections }: { items: Behavior[]
         .map((g) => (
           <section key={g.name} aria-label={g.name} className="flex flex-col gap-2">
             <h2 className={sectionTitle}>{g.name}</h2>
-            <ul className={cx(panel, "divide-y divide-line-soft")}>
+            <ul className="divide-y divide-line">
               {g.specs.map((s) => (
-                <li key={s.key} className="flex flex-col gap-1.5 bg-paper px-5 py-4">
+                <li key={s.key} className="flex flex-col gap-1.5 py-4">
                   <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
                     <span className={cx(chip, "bg-well text-muted")}>{t("spec")}</span>
                     <Link href={itemHref(s.key)} className="text-[13px] font-bold no-underline">{s.key}</Link>
@@ -45,7 +45,7 @@ export default async function Behaviors({ items, sections }: { items: Behavior[]
                 </li>
               ))}
               {g.items.map((b) => (
-                <li key={b.key} className="flex flex-col gap-1.5 px-5 py-4">
+                <li key={b.key} className="flex flex-col gap-1.5 py-4">
                   <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
                     <Link href={`/t/${b.key}`} className="text-[13px] font-bold no-underline">{b.key}</Link>
                     <span className="text-sm font-bold text-ink">{b.title}</span>

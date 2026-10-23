@@ -8,7 +8,7 @@ import Markdown from "@/components/Markdown";
 import { api } from "@/lib/api";
 import type { components } from "@/lib/api-types";
 import { useProblemText } from "@/lib/problem";
-import { button, cx, field, panel } from "@/lib/ui";
+import { button, cx, field, raised } from "@/lib/ui";
 
 type Summary = components["schemas"]["Summary"];
 
@@ -58,12 +58,12 @@ export default function Editor({ summary }: { summary: Summary }) {
       </p>
       {status && <p role="status" className="text-xs text-ok">{status}</p>}
       {error && <p role="alert" className={field.error}>{error}</p>}
-      <div className="grid gap-3 lg:grid-cols-2">
+      <div className={cx(raised, "grid gap-5 p-5 lg:grid-cols-2")}>
         <label className="flex flex-col gap-1.5 text-[13px] font-semibold">
           {t("markdown")}
           <textarea value={markdown} onChange={(e) => setMarkdown(e.target.value)} rows={28} className={cx(field.textarea, "font-mono text-xs")} />
         </label>
-        <section aria-label={t("previewLabel")} className={cx(panel, "overflow-auto p-4")}>
+        <section aria-label={t("previewLabel")} className="min-w-0 overflow-auto border-t border-line pt-4 lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
           <Markdown text={markdown} />
         </section>
       </div>

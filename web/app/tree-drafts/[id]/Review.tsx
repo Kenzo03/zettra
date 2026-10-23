@@ -8,7 +8,7 @@ import Icon from "@/components/Icon";
 import { api } from "@/lib/api";
 import type { components } from "@/lib/api-types";
 import { useProblemText } from "@/lib/problem";
-import { button, chip, cx, field, panel } from "@/lib/ui";
+import { button, chip, cx, field, raised } from "@/lib/ui";
 
 type Draft = components["schemas"]["TreeDraft"];
 type TNode = components["schemas"]["TreeDraftNode"];
@@ -112,7 +112,7 @@ export default function Review({ initial, projectKey, sections }: { initial: Dra
   if (draft.status === "running") {
     const pct = draft.total_parts ? Math.round((100 * draft.done_parts) / draft.total_parts) : 0;
     return (
-      <div className={cx(panel, "flex max-w-xl flex-col gap-3 p-6")} role="status">
+      <div className={cx(raised, "flex max-w-xl flex-col gap-3 p-6")} role="status">
         <div className="flex items-center gap-3">
           <span className="flex size-10 shrink-0 animate-pulse items-center justify-center rounded-full bg-accent-soft text-accent">
             <Icon name="sparkle" className="size-5" />
@@ -260,7 +260,7 @@ export default function Review({ initial, projectKey, sections }: { initial: Dra
       )}
       {draft.status === "discarded" && <p role="status" className={cx(note, "items-center bg-well text-ink-soft")}>{t("discarded")}</p>}
       {draft.status === "applied" && !result && <p role="status" className={cx(note, "items-center bg-well text-ink-soft")}>{t("alreadyApplied")}</p>}
-      <div className={cx(panel, "flex flex-col")}>
+      <div className={cx(raised, "flex flex-col")}>
         {nodes.length === 0 ? (
           <p className="px-6 py-10 text-center text-[13.5px] text-muted">{t("empty")}</p>
         ) : (

@@ -5,7 +5,7 @@ import { getLocale, getTimeZone, getTranslations } from "next-intl/server";
 import PageBar from "@/components/PageBar";
 import { dateTime, itemDay } from "@/lib/format";
 import { getMe, serverApi } from "@/lib/server-api";
-import { chip, cx, panel, sectionTitle, table } from "@/lib/ui";
+import { chip, cx, raised, section, sectionHeading, table } from "@/lib/ui";
 
 // One Ask log entry (FSD §15.4): the exact scope, evidence with scores,
 // answer and dropped claims, for debugging trust issues.
@@ -39,9 +39,9 @@ export default async function AskLogEntryPage({ params }: { params: Promise<{ id
           <span className="text-ink">#{q.id}</span>
         </nav>
       </PageBar>
-      <main className="flex max-w-5xl flex-col gap-4 p-4 md:p-5">
+      <main className="flex max-w-5xl flex-col p-4 md:p-5">
         <h1 className="text-lg font-semibold">{q.question}</h1>
-        <dl className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-[13px] md:grid-cols-4">
+        <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-1.5 text-[13px] md:grid-cols-4">
           {facts.map(([k, v]) => (
             <div key={k}>
               <dt className="text-xs text-muted">{k}</dt>
@@ -49,12 +49,12 @@ export default async function AskLogEntryPage({ params }: { params: Promise<{ id
             </div>
           ))}
         </dl>
-        <section className="flex flex-col gap-2">
-          <h2 className={sectionTitle}>{t("answer")}</h2>
+        <section className={cx(raised, "mt-5 break-words px-6 py-5")}>
+          <h2 className={sectionHeading}>{t("answer")}</h2>
           {q.claims.length === 0 ? (
             <p className="text-[13px] text-muted">{t("noClaims")}</p>
           ) : (
-            <ul className={cx(panel, "flex flex-col gap-1.5 p-3 text-sm")}>
+            <ul className="flex flex-col gap-1.5 text-sm">
               {q.claims.map((c, i) => (
                 <li key={i}>
                   {c.text}{" "}
@@ -66,10 +66,10 @@ export default async function AskLogEntryPage({ params }: { params: Promise<{ id
             </ul>
           )}
         </section>
-        <section className="flex flex-col gap-2">
-          <h2 className={sectionTitle}>{t("evidence", { count: q.evidence.length })}</h2>
+        <section className={section}>
+          <h2 className={sectionHeading}>{t("evidence", { count: q.evidence.length })}</h2>
           {q.evidence.length > 0 && (
-            <div className={table.wrap}>
+            <div className={table.plain}>
               <table className={table.table}>
                 <thead className={table.head}>
                   <tr>
@@ -97,14 +97,14 @@ export default async function AskLogEntryPage({ params }: { params: Promise<{ id
             </div>
           )}
         </section>
-        <section className="flex flex-col gap-2">
-          <h2 className={sectionTitle}>{t("scope")}</h2>
-          <pre className={cx(panel, "overflow-x-auto p-3 font-mono text-xs")}>{JSON.stringify(q.scope, null, 2)}</pre>
+        <section className={section}>
+          <h2 className={sectionHeading}>{t("scope")}</h2>
+          <pre className={cx(table.plain, "p-3 font-mono text-xs")}>{JSON.stringify(q.scope, null, 2)}</pre>
         </section>
         {q.dropped && (
-          <section className="flex flex-col gap-2">
-            <h2 className={sectionTitle}>{t("dropped")}</h2>
-            <pre className={cx(panel, "overflow-x-auto p-3 font-mono text-xs")}>{JSON.stringify(q.dropped, null, 2)}</pre>
+          <section className={section}>
+            <h2 className={sectionHeading}>{t("dropped")}</h2>
+            <pre className={cx(table.plain, "p-3 font-mono text-xs")}>{JSON.stringify(q.dropped, null, 2)}</pre>
           </section>
         )}
       </main>

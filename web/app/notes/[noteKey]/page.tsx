@@ -9,7 +9,7 @@ import PageBar from "@/components/PageBar";
 import { actionItems } from "@/lib/actions";
 import { dateTime, day } from "@/lib/format";
 import { getProject, serverApi } from "@/lib/server-api";
-import { button, cx, panel, sectionTitle } from "@/lib/ui";
+import { button, cx, raised, section, sectionHeading } from "@/lib/ui";
 import CreateAll from "./CreateAll";
 
 // One decision note (FSD §9.4). The author and project admins edit it; every
@@ -68,8 +68,6 @@ export default async function NotePage({ params, searchParams }: {
           <Link href={`/p/${note.project_key}/board`}>{note.project_key}</Link>
           <Icon name="chevronRight" className="size-3.5" />
           <Link href={`/p/${note.project_key}/notes`}>{t("heading")}</Link>
-          <Icon name="chevronRight" className="size-3.5" />
-          <span className="font-mono font-semibold text-ink">{note.key}</span>
         </nav>
         {note.can_edit && !editing && (
           <Link href="?edit=1" className={cx(button.secondary, "ml-auto")}>
@@ -80,7 +78,7 @@ export default async function NotePage({ params, searchParams }: {
       </PageBar>
       <main className="flex flex-col gap-4 px-4 py-4 md:px-5">
         {editing ? (
-          <div className={panel}>{form}</div>
+          <div className={raised}>{form}</div>
         ) : (
           <>
             <div className="flex flex-col gap-2">
@@ -90,29 +88,29 @@ export default async function NotePage({ params, searchParams }: {
                 <ClientChip client={note.client} coreLabel={t("allClients")} />
                 {note.archived && <span>{t("archivedLabel")}</span>}
               </div>
-              <h1 className="text-2xl font-semibold leading-tight">{note.title}</h1>
+              <h1 className="max-w-[24ch] break-words text-[34px] font-extrabold leading-[1.12] tracking-[-0.025em] [text-wrap:pretty]">{note.title}</h1>
             </div>
-            <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
-              <section aria-label={t("body")} className={cx(panel, "px-4 py-3.5")}>
+            <div className="mt-1.5 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-11">
+              <section aria-label={t("body")} className={cx(raised, "min-w-0 break-words px-6.5 py-5.5")}>
                 <Markdown text={note.body} />
               </section>
-              <aside className={cx(panel, "flex flex-col gap-3 px-4 py-3.5 text-[13px]")}>
-                <div>
-                  <h2 className={sectionTitle}>{t("attendees")}</h2>
+              <aside className="min-w-0 break-words text-[13.5px]">
+                <section className={section}>
+                  <h2 className={sectionHeading}>{t("attendees")}</h2>
                   <p>{note.attendees || "—"}</p>
-                </div>
-                <div>
-                  <h2 className={sectionTitle}>{t("menus")}</h2>
+                </section>
+                <section className={section}>
+                  <h2 className={sectionHeading}>{t("menus")}</h2>
                   {note.nodes.length === 0 && <p>{t("wholeProject")}</p>}
                   <ul className="flex flex-wrap gap-1.5">
                     {note.nodes.map((n) => (
                       <li key={n.id}><Link href={`/p/${note.project_key}/modules/${n.id}`}>{n.name}</Link></li>
                     ))}
                   </ul>
-                </div>
+                </section>
                 {actions.length > 0 && (
-                  <div>
-                    <h2 className={sectionTitle}>{t("actionItems")}</h2>
+                  <section className={section}>
+                    <h2 className={sectionHeading}>{t("actionItems")}</h2>
                     <ul className="flex flex-col gap-2">
                       {actions.map((a, i) => {
                         const done = filed(a.task);
@@ -133,10 +131,10 @@ export default async function NotePage({ params, searchParams }: {
                       })}
                     </ul>
                     {canFile && <CreateAll projectKey={note.project_key} tickets={unfiled} />}
-                  </div>
+                  </section>
                 )}
-                <div>
-                  <h2 className={sectionTitle}>{t("tickets")}</h2>
+                <section className={section}>
+                  <h2 className={sectionHeading}>{t("tickets")}</h2>
                   {note.tickets.length === 0 ? <p className="text-muted">—</p> : (
                     <ul className="flex flex-col gap-1">
                       {note.tickets.map((tk) => (
@@ -144,8 +142,8 @@ export default async function NotePage({ params, searchParams }: {
                       ))}
                     </ul>
                   )}
-                </div>
-                <p className="text-xs text-muted">{t("byline", { name: note.author.name, at: dateTime(note.updated_at, locale, timeZone) })}</p>
+                </section>
+                <p className="mt-4.5 text-xs text-muted">{t("byline", { name: note.author.name, at: dateTime(note.updated_at, locale, timeZone) })}</p>
               </aside>
             </div>
           </>

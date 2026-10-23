@@ -8,7 +8,7 @@ import { itemHref } from "@/lib/ask";
 import { asTables } from "@/lib/convert";
 import { dateIn, day, dayOf } from "@/lib/format";
 import type { Client, TimelineEntry, TimelineNote, TimelineSection } from "@/lib/problem";
-import { button, chip, cx, field } from "@/lib/ui";
+import { button, chip, cx, field, raised } from "@/lib/ui";
 
 const types = ["bug", "change_request", "feature"] as const;
 
@@ -62,7 +62,10 @@ export default async function Timeline({ items, notes, sections, failed, more, l
   // Each filter is a chip: its name, then a borderless control.
   const pick = "flex h-9 items-center gap-1 rounded-[10px] border border-line bg-white pl-3 text-[13.5px] font-semibold text-ink focus-within:border-accent";
   const control = "h-full cursor-pointer rounded-[10px] bg-transparent text-[13.5px] font-medium text-muted outline-none";
-  const card = "rounded-2xl border border-line bg-white shadow-[0_1px_2px_rgba(43,36,32,0.04)]";
+  // Entries sit on the page as ruled rows; the one raised card is the newest closed
+  // ticket whose decision still stands. Without one, nothing is raised.
+  const flat = "break-words border-b border-line pb-4 pt-4";
+  const raisedKey = closedTickets.find((it) => it.decision && !it.decision.superseded_by)?.key;
 
   return (
     <>
@@ -120,7 +123,7 @@ export default async function Timeline({ items, notes, sections, failed, more, l
                     <Rail color={it.status.color} open />
                     <article
                       aria-label={`${it.key} ${it.title}`}
-                      className={cx(card, "mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 px-4 py-3 text-[13px]")}
+                      className="mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 border-b border-line pb-4 pt-3 text-[13px]"
                     >
                       <Link href={`/t/${it.key}`} className="font-bold text-muted no-underline hover:text-ink">{it.key}</Link>
                       <Link href={`/t/${it.key}`} className="text-[14.5px] font-bold text-ink no-underline hover:text-ink hover:underline">{it.title}</Link>
@@ -160,7 +163,7 @@ export default async function Timeline({ items, notes, sections, failed, more, l
                           <span className="text-xs text-muted">{t("note")}</span>
                         </div>
                         <Rail color="#8A7F76" />
-                        <article aria-label={`${n.key} ${n.title}`} className="mb-3 flex flex-col gap-2 rounded-2xl border border-dashed border-field bg-paper px-5 py-4">
+                        <article aria-label={`${n.key} ${n.title}`} className={cx(flat, "mb-3 flex flex-col gap-2")}>
                           <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
                             <Link href={`/notes/${n.key}`} className="text-[13px] font-bold no-underline">{n.key}</Link>
                             <span className={cx(chip, "rounded-full bg-well text-ink-soft")}>{t("note")}</span>
@@ -187,7 +190,7 @@ export default async function Timeline({ items, notes, sections, failed, more, l
                         <span className="text-xs text-muted">{it.status.name}</span>
                       </div>
                       <Rail color={it.status.color} />
-                      <article aria-label={`${it.key} ${it.title}`} className={cx(card, "mb-3 flex flex-col gap-3 px-5 py-4")}>
+                      <article aria-label={`${it.key} ${it.title}`} className={cx(it.key === raisedKey ? cx(raised, "break-words px-5.5 py-4.5") : flat, "mb-3 flex flex-col gap-3")}>
                         <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
                           <Link href={`/t/${it.key}`} className="text-[13px] font-bold text-ink-soft no-underline hover:text-ink">{it.key}</Link>
                           {it.decision && (
@@ -217,7 +220,7 @@ export default async function Timeline({ items, notes, sections, failed, more, l
                               </div>
                             </div>
                             {it.decision.alternatives && (
-                              <details className="group rounded-xl bg-paper px-4 py-2.5 text-[13px]">
+                              <details className="group text-[13px]">
                                 <summary className="flex cursor-pointer items-center gap-1.5 font-bold text-link">
                                   <Icon name="chevronRight" className="size-3.5 transition-transform group-open:rotate-90" />
                                   {t("alternatives")}
@@ -255,7 +258,7 @@ export default async function Timeline({ items, notes, sections, failed, more, l
                     <span className="text-xs text-muted">{t("spec")}</span>
                   </div>
                   <Rail color="#8A7F76" />
-                  <article aria-label={d.document_title} className="mb-3 flex flex-col gap-3 rounded-2xl border border-dashed border-field bg-paper px-5 py-4">
+                  <article aria-label={d.document_title} className={cx(flat, "mb-3 flex flex-col gap-3")}>
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
                       <Link href={`/documents/${d.document_key}`} className="text-[13px] font-bold no-underline">{d.document_key}</Link>
                       <span>{d.document_title}</span>

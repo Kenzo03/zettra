@@ -104,8 +104,6 @@ export default async function NodePage({
               <Link href={`/p/${key}/modules/${p.id}`}>{p.name}</Link>
             </Fragment>
           ))}
-          <Icon name="chevronRight" className="size-3.5" />
-          <span className="font-semibold text-ink">{node.name}</span>
         </nav>
         <div className="flex flex-wrap items-start gap-4">
           <div className="flex min-w-0 flex-col gap-2">

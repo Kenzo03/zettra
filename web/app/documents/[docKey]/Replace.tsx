@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { api } from "@/lib/api";
 import { useProblemText } from "@/lib/problem";
-import { button, cx, field, panel, sectionTitle } from "@/lib/ui";
+import { button, field, section, sectionHeading } from "@/lib/ui";
 
 // Version (§7.7): project admins mark this document replaced by a newer one of
 // the project, when its upload did not say so, or make it current again. Ask
@@ -31,36 +31,38 @@ export default function Replace({ docKey, supersededBy, candidates }: {
   }
 
   return (
-    <section aria-labelledby="version-title" className={cx(panel, "flex flex-col gap-2.5 p-4")}>
-      <h2 id="version-title" className={sectionTitle}>{t("version")}</h2>
-      {supersededBy ? (
-        <>
-          <p className="text-[13px] text-ink-soft">{t("supersededBy", { key: supersededBy })}</p>
-          <button type="button" disabled={busy} onClick={() => save(null)} className={button.secondary}>{t("makeCurrent")}</button>
-        </>
-      ) : candidates.length === 0 ? (
-        <p className="text-[13px] text-muted">{t("noNewer")}</p>
-      ) : (
-        <form
-          className="flex flex-col gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            save(String(new FormData(e.currentTarget).get("by")));
-          }}
-        >
-          <p className={field.hint}>{t("replaceHint")}</p>
-          <label className={field.label}>
-            {t("replacedBy")}
-            <select name="by" className={field.compact}>
-              {candidates.map((c) => (
-                <option key={c.key} value={c.key}>{c.key} · {c.title}</option>
-              ))}
-            </select>
-          </label>
-          <button disabled={busy} className={button.secondary}>{t("replace")}</button>
-        </form>
-      )}
-      {error && <p role="alert" className={field.error}>{error}</p>}
+    <section aria-labelledby="version-title" className={section}>
+      <h2 id="version-title" className={sectionHeading}>{t("version")}</h2>
+      <div className="flex flex-col gap-2.5">
+        {supersededBy ? (
+          <>
+            <p className="text-[13px] text-ink-soft">{t("supersededBy", { key: supersededBy })}</p>
+            <button type="button" disabled={busy} onClick={() => save(null)} className={button.secondary}>{t("makeCurrent")}</button>
+          </>
+        ) : candidates.length === 0 ? (
+          <p className="text-[13px] text-muted">{t("noNewer")}</p>
+        ) : (
+          <form
+            className="flex flex-col gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              save(String(new FormData(e.currentTarget).get("by")));
+            }}
+          >
+            <p className={field.hint}>{t("replaceHint")}</p>
+            <label className={field.label}>
+              {t("replacedBy")}
+              <select name="by" className={field.compact}>
+                {candidates.map((c) => (
+                  <option key={c.key} value={c.key}>{c.key} · {c.title}</option>
+                ))}
+              </select>
+            </label>
+            <button disabled={busy} className={button.secondary}>{t("replace")}</button>
+          </form>
+        )}
+        {error && <p role="alert" className={field.error}>{error}</p>}
+      </div>
     </section>
   );
 }
