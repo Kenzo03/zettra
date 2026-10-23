@@ -341,8 +341,8 @@ test("views, panel and chips follow the URL", async ({ page }) => {
 
   await page.goto(`/p/${key}/tickets?status=open&missing=reason`);
   const views = page.getByRole("group", { name: "Tampilan" });
-  await expect(views.getByRole("link", { name: "Semua yang terbuka" })).toHaveAttribute("aria-pressed", "true");
-  await expect(views.getByRole("link", { name: "Terlambat" })).toHaveAttribute("aria-pressed", "false");
+  await expect(views.getByRole("link", { name: "Semua yang terbuka" })).toHaveAttribute("aria-current", "true");
+  await expect(views.getByRole("link", { name: "Terlambat" })).not.toHaveAttribute("aria-current");
   // Status and Missing are set inside the panel; All open already shows Status, so only Missing is a chip.
   const filters = page.getByRole("button", { name: "Filter (2)" });
   await expect(filters).toBeVisible();
