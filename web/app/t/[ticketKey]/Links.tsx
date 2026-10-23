@@ -8,7 +8,7 @@ import { StatusDot } from "@/components/Chips";
 import Icon from "@/components/Icon";
 import { api } from "@/lib/api";
 import { useProblemText, type LinkType, type TicketLink } from "@/lib/problem";
-import { button, cx, field, panel } from "@/lib/ui";
+import { button, cx, field, section, sectionHeading } from "@/lib/ui";
 
 const types: LinkType[] = ["reverses", "extends", "related_to"];
 
@@ -42,9 +42,9 @@ export default function Links({ ticketKey, links, canEdit }: { ticketKey: string
   }
 
   return (
-    <section aria-labelledby="links-title" className={cx(panel, "flex flex-col gap-2.5 px-5 py-4")}>
-      <div className="flex items-center gap-2">
-        <h2 id="links-title" className="text-sm font-extrabold">{t("title")}</h2>
+    <section aria-labelledby="links-title" className={section}>
+      <div className={sectionHeading}>
+        <h2 id="links-title">{t("title")}</h2>
         {canEdit && !adding && (
           <button type="button" onClick={() => setAdding(true)} className={cx(button.quiet, "ml-auto")}>
             <Icon name="plus" className="size-3.5" />
@@ -52,15 +52,15 @@ export default function Links({ ticketKey, links, canEdit }: { ticketKey: string
           </button>
         )}
       </div>
-      {links.length === 0 && !adding && <p className="text-sm text-muted">{t("none")}</p>}
+      {links.length === 0 && !adding && <p className="mb-2 text-sm text-muted">{t("none")}</p>}
       {links.length > 0 && (
-        <ul className="flex flex-col gap-1.5">
+        <ul className="mb-2 flex flex-col gap-1.5">
           {links.map((l) => (
-            <li key={l.id} className="flex flex-wrap items-center gap-2 text-[13px]">
-              <span className="text-muted">{t(`${l.type}.${l.outgoing ? "out" : "in"}`)}</span>
+            <li key={l.id} className="flex items-center gap-2 text-[13px]">
+              <span className="shrink-0 text-muted">{t(`${l.type}.${l.outgoing ? "out" : "in"}`)}</span>
               <StatusDot color={l.ticket.status.color} />
-              <Link href={`/t/${l.ticket.key}`} className="font-bold">{l.ticket.key}</Link>
-              <span className="min-w-0 truncate">{l.ticket.title}</span>
+              <Link href={`/t/${l.ticket.key}`} className="shrink-0 font-bold">{l.ticket.key}</Link>
+              <span className="min-w-0 truncate" title={l.ticket.title}>{l.ticket.title}</span>
               {canEdit && (
                 <button type="button" onClick={() => remove(l.id)} aria-label={t("remove", { key: l.ticket.key })} className={cx(button.quiet, "ml-auto text-muted")}>
                   <Icon name="x" className="size-3.5" />
@@ -71,7 +71,7 @@ export default function Links({ ticketKey, links, canEdit }: { ticketKey: string
         </ul>
       )}
       {adding && (
-        <form onSubmit={add} aria-label={t("add")} className="flex flex-wrap items-end gap-2">
+        <form onSubmit={add} aria-label={t("add")} className="mb-2 flex flex-wrap items-end gap-2">
           <label className={field.label}>
             {t("type")}
             <select name="type" defaultValue="related_to" className={field.compact}>
@@ -88,7 +88,7 @@ export default function Links({ ticketKey, links, canEdit }: { ticketKey: string
           <button type="button" onClick={() => { setAdding(false); setError(""); }} className={button.secondary}>{t("cancel")}</button>
         </form>
       )}
-      {error && <p role="alert" className={field.error}>{error}</p>}
+      {error && <p role="alert" className={cx(field.error, "mb-2")}>{error}</p>}
       <p className={field.hint}>{t("hint")}</p>
     </section>
   );

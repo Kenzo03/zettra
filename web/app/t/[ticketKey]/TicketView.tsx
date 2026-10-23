@@ -14,7 +14,7 @@ import { api } from "@/lib/api";
 import { dateTime, day } from "@/lib/format";
 import { nodePaths } from "@/lib/nodes";
 import { useProblemText, type Client, type Node, type Ref, type Status, type Ticket } from "@/lib/problem";
-import { button, cx, field, panel, sectionTitle } from "@/lib/ui";
+import { button, cx, field, raised, rail, section, sectionHeading } from "@/lib/ui";
 import Acceptance from "./Acceptance";
 import Code from "./Code";
 import DecisionCard from "./DecisionCard";
@@ -88,8 +88,9 @@ export default function TicketView({ ticket, statuses, clients, nodes, assignees
     router.refresh();
   }
 
-  const block = "flex flex-col gap-2 border-b border-line-soft px-5 py-4 last:border-0";
   const person = "size-6 bg-accent-soft text-[10px] font-bold text-accent-strong";
+  // One raised card a page: the decision record once the ticket has one, else the Reason.
+  const raiseReason = !ticket.decision;
   return (
     <>
       <PageBar>
@@ -97,8 +98,6 @@ export default function TicketView({ ticket, statuses, clients, nodes, assignees
           <Link href={`/p/${ticket.project_key}/board`}>{ticket.project_key}</Link>
           <Icon name="chevronRight" className="size-3.5" />
           <Link href={`/p/${ticket.project_key}/tickets`}>{tp("tickets")}</Link>
-          <Icon name="chevronRight" className="size-3.5" />
-          <span className="font-bold text-ink">{ticket.key}</span>
         </nav>
         <Link href={askAbout(ticket)} className={cx(button.secondary, "ml-auto")}>
           <Icon name="sparkle" className="size-4 text-accent" />
@@ -141,7 +140,7 @@ export default function TicketView({ ticket, statuses, clients, nodes, assignees
             {showsClients(clients) && <ClientChip client={ticket.client} coreLabel={t("core")} />}
             {(ticket.priority === "high" || ticket.priority === "urgent") && <PriorityChip priority={ticket.priority} label={tPri(ticket.priority)} />}
           </div>
-          <h1 className="max-w-4xl text-[28px] font-extrabold leading-tight tracking-[-0.02em] [text-wrap:pretty]">{ticket.title}</h1>
+          <h1 className="max-w-[24ch] break-words text-[34px] font-extrabold leading-[1.12] tracking-[-0.025em] [text-wrap:pretty]">{ticket.title}</h1>
         </div>
         {error && <p role="alert" className={field.error}>{error}</p>}
         {!closing(ticket.status) && (!ticket.reason || ticket.nodes.length === 0) && (
@@ -151,7 +150,7 @@ export default function TicketView({ ticket, statuses, clients, nodes, assignees
           </p>
         )}
         {editing ? (
-          <div className={panel}>
+          <div className={raised}>
             <TicketForm
               projectKey={ticket.project_key}
               ticket={ticket}
@@ -166,132 +165,142 @@ export default function TicketView({ ticket, statuses, clients, nodes, assignees
             />
           </div>
         ) : (
-          <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-            <div className="flex min-w-0 flex-col gap-4">
-              <section aria-labelledby="reason-title" className={cx(panel, "flex flex-col gap-2.5 px-5 py-4")}>
-                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-                  <span className="flex size-7 items-center justify-center rounded-lg bg-accent-soft text-accent">
-                    <Icon name="message" />
-                  </span>
-                  <h2 id="reason-title" className="text-sm font-extrabold">{t("reason")}</h2>
-                  <span className="text-[12.5px] text-muted">
+          <div className="grid items-start gap-11 lg:grid-cols-[minmax(0,1fr)_300px]">
+            <div className="min-w-0">
+              <section aria-labelledby="reason-title" className={raiseReason ? cx(raised, "px-6 py-5.5") : "mb-5 max-w-[64ch]"}>
+                <div className="mb-1.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-1 text-[12.5px] text-muted">
+                  <h2 id="reason-title" className="font-semibold">{t("reason")}</h2>
+                  <span>
                     {t("requestedBy")} {ticket.requester.name}{ticket.requester.title ? ` (${ticket.requester.title})` : ""}
                   </span>
                 </div>
                 {ticket.reason ? (
-                  <p className="whitespace-pre-wrap text-[17px] font-semibold leading-relaxed tracking-[-0.01em] [text-wrap:pretty]">{ticket.reason}</p>
+                  <p className={cx("whitespace-pre-wrap [text-wrap:pretty]", raiseReason ? "text-[19px] font-bold leading-[1.4] tracking-[-0.01em]" : "text-[18px] font-medium leading-normal")}>{ticket.reason}</p>
                 ) : (
-                  <p className="text-sm text-muted">{t("none")}</p>
+                  <p className={cx("text-muted", raiseReason ? "text-[19px] font-bold" : "text-[18px] font-medium")}>{t("none")}</p>
                 )}
               </section>
               {ticket.decision && <DecisionCard ticketKey={ticket.key} decision={ticket.decision} canEdit={canEditDecision} />}
-              <section aria-label={t("details")} className={panel}>
-                <div className={block}>
-                  <h2 className={sectionTitle}>{t("menus")}</h2>
+              <section aria-label={t("details")} className={section}>
+                <section aria-labelledby="menus-title" className={section}>
+                  <h2 id="menus-title" className={sectionHeading}>{t("menus")}</h2>
                   {ticket.nodes.length === 0 ? (
                     <p className="text-sm text-muted">{t("none")}</p>
                   ) : (
                     <ul className="flex flex-wrap gap-2">
                       {ticket.nodes.map((n) => (
-                        <li key={n.id}>
+                        <li key={n.id} className="min-w-0">
                           <Link
                             href={`/p/${ticket.project_key}/modules/${n.id}`}
-                            className="inline-flex h-8 items-center gap-2 rounded-[10px] bg-well px-3 text-[13.5px] font-semibold text-ink no-underline hover:bg-line-soft hover:text-ink"
+                            title={pathOf(n.id) || n.name}
+                            className="inline-flex h-8 max-w-full items-center gap-2 rounded-[10px] bg-well px-3 text-[13.5px] font-semibold text-ink no-underline hover:bg-line-soft hover:text-ink"
                           >
-                            <Icon name="screen" className="size-3.5 text-muted" />
-                            {pathOf(n.id) || n.name}
+                            <Icon name="screen" className="size-3.5 shrink-0 text-muted" />
+                            <span className="truncate">{pathOf(n.id) || n.name}</span>
                             {n.archived ? ` (${t("archived")})` : ""}
                           </Link>
                         </li>
                       ))}
                     </ul>
                   )}
-                </div>
-                <div className={block}>
-                  <h2 className={sectionTitle}>{t("description")}</h2>
+                </section>
+                <section aria-labelledby="description-title" className={section}>
+                  <h2 id="description-title" className={sectionHeading}>{t("description")}</h2>
                   {ticket.description ? (
                     <Markdown text={ticket.description} people={people} onTask={canEdit ? tickTask : undefined} />
                   ) : (
                     <p className="text-sm text-muted">{t("none")}</p>
                   )}
-                  {taskError && <p role="alert" className="text-xs text-danger">{taskError}</p>}
-                </div>
+                  {taskError && <p role="alert" className="mt-2 text-xs text-danger">{taskError}</p>}
+                </section>
               </section>
               <Links ticketKey={ticket.key} links={ticket.links} canEdit={canEdit} />
               {ticket.code && <Code code={ticket.code} />}
               {activity}
             </div>
-            <aside className="flex flex-col gap-4">
-              <section aria-label={t("people")} className={cx(panel, "flex flex-col gap-3.5 px-5 py-4")}>
-                <dl className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-3 text-[13.5px] leading-snug">
-                  <dt className="text-muted">{t("requestedBy")}</dt>
-                  <dd className="flex min-w-0 items-center gap-2">
-                    <Avatar name={ticket.requester.name} className={person} />
-                    <span className="min-w-0">
-                      <span className="block font-semibold">{ticket.requester.name}</span>
-                      {ticket.requester.title && <span className="block text-xs text-muted">{ticket.requester.title}</span>}
-                    </span>
-                  </dd>
-                  <dt className="text-muted">{t("reporter")}</dt>
-                  <dd className="flex min-w-0 items-center gap-2">
-                    <Avatar name={ticket.reporter.name} className={person} />
-                    <span className="font-semibold">{ticket.reporter.name}</span>
-                  </dd>
-                  <dt className="text-muted">{t("assignee")}</dt>
-                  <dd className="flex min-w-0 items-center gap-2">
-                    {ticket.assignee ? (
-                      <>
-                        <Avatar name={ticket.assignee.name} className={person} />
-                        <span className="font-semibold">{ticket.assignee.name}</span>
-                      </>
-                    ) : (
-                      <span className="text-muted">{t("nobody")}</span>
-                    )}
-                  </dd>
-                  <dt className="text-muted">{tf("priority")}</dt>
-                  <dd>
-                    <PriorityChip priority={ticket.priority} label={tPri(ticket.priority)} />
-                  </dd>
+            <aside className="min-w-0">
+              <section aria-label={t("people")} className={section}>
+                <dl className={rail.list}>
+                  <div className={rail.row}>
+                    <dt className={rail.label}>{t("requestedBy")}</dt>
+                    <dd className={cx(rail.value, "flex items-center gap-2")}>
+                      <Avatar name={ticket.requester.name} className={person} />
+                      <span className="min-w-0">
+                        <span className="block truncate" title={ticket.requester.name}>{ticket.requester.name}</span>
+                        {ticket.requester.title && <span className="block truncate text-xs font-medium text-muted" title={ticket.requester.title}>{ticket.requester.title}</span>}
+                      </span>
+                    </dd>
+                  </div>
+                  <div className={rail.row}>
+                    <dt className={rail.label}>{t("reporter")}</dt>
+                    <dd className={cx(rail.value, "flex items-center gap-2")}>
+                      <Avatar name={ticket.reporter.name} className={person} />
+                      <span className="truncate" title={ticket.reporter.name}>{ticket.reporter.name}</span>
+                    </dd>
+                  </div>
+                  <div className={rail.row}>
+                    <dt className={rail.label}>{t("assignee")}</dt>
+                    <dd className={cx(rail.value, "flex items-center gap-2")}>
+                      {ticket.assignee ? (
+                        <>
+                          <Avatar name={ticket.assignee.name} className={person} />
+                          <span className="truncate" title={ticket.assignee.name}>{ticket.assignee.name}</span>
+                        </>
+                      ) : (
+                        <span className="font-medium text-muted">{t("nobody")}</span>
+                      )}
+                    </dd>
+                  </div>
+                  <div className={rail.row}>
+                    <dt className={rail.label}>{tf("priority")}</dt>
+                    <dd className={rail.value}>
+                      <PriorityChip priority={ticket.priority} label={tPri(ticket.priority)} />
+                    </dd>
+                  </div>
                   {ticket.due_date && (
-                    <>
-                      <dt className="text-muted">{t("due")}</dt>
-                      <dd className="font-semibold">{day(ticket.due_date, locale)}</dd>
-                    </>
+                    <div className={rail.row}>
+                      <dt className={rail.label}>{t("due")}</dt>
+                      <dd className={rail.value}>{day(ticket.due_date, locale)}</dd>
+                    </div>
                   )}
                   {(ticket.labels?.length ?? 0) > 0 && (
-                    <>
-                      <dt className="text-muted">{t("labels")}</dt>
-                      <dd className="flex flex-wrap gap-1">
+                    <div className={rail.row}>
+                      <dt className={rail.label}>{t("labels")}</dt>
+                      <dd className={cx(rail.value, "flex flex-wrap gap-1")}>
                         {ticket.labels!.map((l) => (
-                          <a key={l} href={`/p/${ticket.project_key}/tickets?label=${encodeURIComponent(l)}`} className="rounded-full bg-well px-2 text-xs font-semibold text-ink-soft no-underline hover:text-ink">
+                          <a key={l} href={`/p/${ticket.project_key}/tickets?label=${encodeURIComponent(l)}`} className="max-w-full truncate rounded-full bg-well px-2 text-xs font-semibold text-ink-soft no-underline hover:text-ink" title={l}>
                             {l}
                           </a>
                         ))}
                       </dd>
-                    </>
+                    </div>
                   )}
                   {ticket.release && (
-                    <>
-                      <dt className="text-muted">{t("release")}</dt>
-                      <dd><a href={`/p/${ticket.project_key}/tickets?release=${ticket.release.id}`} className="font-semibold">{ticket.release.name}</a></dd>
-                    </>
+                    <div className={rail.row}>
+                      <dt className={rail.label}>{t("release")}</dt>
+                      <dd className={rail.value}>
+                        <a href={`/p/${ticket.project_key}/tickets?release=${ticket.release.id}`} className="block truncate" title={ticket.release.name}>{ticket.release.name}</a>
+                      </dd>
+                    </div>
                   )}
                   {ticket.estimate_hours != null && (
-                    <>
-                      <dt className="text-muted">{t("estimate")}</dt>
-                      <dd>{t("hours", { hours: ticket.estimate_hours })}</dd>
-                    </>
+                    <div className={rail.row}>
+                      <dt className={rail.label}>{t("estimate")}</dt>
+                      <dd className={rail.value}>{t("hours", { hours: ticket.estimate_hours })}</dd>
+                    </div>
                   )}
-                  <dt className="text-muted">{t("created")}</dt>
-                  <dd>{dateTime(ticket.created_at, locale, timeZone)}</dd>
+                  <div className={rail.row}>
+                    <dt className={rail.label}>{t("created")}</dt>
+                    <dd className={rail.value}>{dateTime(ticket.created_at, locale, timeZone)}</dd>
+                  </div>
                   {ticket.closed_at && (
-                    <>
-                      <dt className="text-muted">{t("closed")}</dt>
-                      <dd>{dateTime(ticket.closed_at, locale, timeZone)}</dd>
-                    </>
+                    <div className={rail.row}>
+                      <dt className={rail.label}>{t("closed")}</dt>
+                      <dd className={rail.value}>{dateTime(ticket.closed_at, locale, timeZone)}</dd>
+                    </div>
                   )}
                 </dl>
-                <p className="border-t border-line-soft pt-3 text-xs text-muted">
+                <p className="mt-2.5 text-xs text-muted">
                   {t("updated")} {dateTime(ticket.updated_at, locale, timeZone)}
                 </p>
               </section>
