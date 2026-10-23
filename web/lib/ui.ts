@@ -4,7 +4,7 @@
 export const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(" ");
 
 const buttonBase =
-  "inline-flex h-9 shrink-0 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-[10px] px-3.5 text-[13.5px] font-semibold no-underline transition-[color,background-color,border-color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:active:scale-100 disabled:cursor-default disabled:opacity-40";
+  "inline-flex h-9 shrink-0 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-[10px] px-3.5 text-[13.5px] font-semibold no-underline transition-[color,background-color,border-color,scale] duration-150 ease-out active:scale-[0.97] motion-reduce:active:scale-100 disabled:cursor-default disabled:opacity-40";
 
 export const button = {
   primary: `${buttonBase} bg-accent text-white shadow-[0_1px_2px_rgba(120,40,20,0.25)] hover:bg-accent-strong hover:text-white`,
