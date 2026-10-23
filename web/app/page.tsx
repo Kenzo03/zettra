@@ -9,10 +9,15 @@ import { dateIn, day, dayOf } from "@/lib/format";
 import { active } from "@/lib/projects";
 import { getMe, getProjects, serverApi } from "@/lib/server-api";
 import { one } from "@/lib/ticket-query";
-import { button, cx, panel } from "@/lib/ui";
+import { button, cx, raised, section, sectionHeading } from "@/lib/ui";
 
 const views = ["all", "overdue", "week", "incomplete"] as const;
 type View = (typeof views)[number];
+
+// A section's title and its hint on one baseline.
+const head = "mb-3 flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5";
+const title = "text-sm font-extrabold";
+const hint = "text-[13px] text-muted";
 
 // Home (FSD §6.4): what I have to do and what changed in my projects. A work
 // list, not a report, so no charts. The tab lives in the URL (/?mine=overdue).
@@ -48,10 +53,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
       ] as const)
     : [];
   const checklist = steps.some(([, done]) => !done) && (
-    <section aria-labelledby="setup-title" className={cx(panel, "mx-4 mb-2 flex flex-col gap-3 px-5 py-4 md:mx-5")}>
-      <div className="flex flex-col gap-0.5">
-        <h2 id="setup-title" className="text-base font-extrabold">{t("setup.title")}</h2>
-        <span className="text-[13px] text-muted">{t("setup.hint")}</span>
+    <section aria-labelledby="setup-title" className={cx(section, "mb-7")}>
+      <div className={head}>
+        <h2 id="setup-title" className={title}>{t("setup.title")}</h2>
+        <span className={hint}>{t("setup.hint")}</span>
       </div>
       <ol className="flex flex-col gap-1.5">
         {steps.map(([name, done, href]) => (
@@ -113,40 +118,44 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
           </Link>
         )}
       </div>
-      {checklist}
       {projects.length === 0 ? (
-        <main className="p-4 md:p-5">
+        <main className="px-4 pb-8 pt-3 md:px-5">
+          {checklist}
           <p className="text-muted">{me.is_admin ? t("noProjectsAdmin") : t("noProjects")}</p>
         </main>
       ) : (
         <main className="grid items-start gap-6 px-4 pb-8 pt-3 md:px-5 xl:grid-cols-[minmax(0,1fr)_360px]">
-          <div className="flex min-w-0 flex-col gap-5">
+          <div className="min-w-0">
+            {checklist}
             {/* The Home Ask box (FSD §6.4): the question opens on the Ask page. */}
-            <form action="/ask" role="search" aria-label={tk("title")} className={cx(panel, "flex items-center gap-3 p-3 pl-4 focus-within:border-accent")}>
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
-                <Icon name="sparkle" className="size-5" />
-              </span>
+            <form
+              action="/ask"
+              role="search"
+              aria-label={tk("title")}
+              className="mb-7 flex h-13 items-center gap-3 rounded-[14px] border border-field bg-white pl-4 pr-2 focus-within:border-accent"
+            >
+              <Icon name="sparkle" className="size-5 shrink-0 text-accent" />
               <input
                 name="q"
                 required
                 maxLength={1000}
                 aria-label={tk("question")}
                 placeholder={tk("homePlaceholder")}
-                className="h-11 min-w-0 flex-1 bg-transparent text-base font-medium text-ink outline-none placeholder:text-muted"
+                className="h-full min-w-0 flex-1 bg-transparent text-[15px] font-medium text-ink outline-none placeholder:text-muted"
               />
               <button type="submit" className={button.primary}>{tk("send")}</button>
             </form>
             {/* MSL-9: a lead with nothing assigned still sees what is late, unowned or incomplete. */}
             {watch.length > 0 && (
-              <section aria-labelledby="attention-title" className={cx(panel, "min-w-0 px-5 py-4")}>
-                <div className="flex flex-col gap-0.5">
-                  <h2 id="attention-title" className="text-base font-extrabold">{t("attention")}</h2>
-                  <span className="text-[13px] text-muted">{t("attentionHint")}</span>
+              <section aria-labelledby="attention-title" className={cx(section, "mb-7 min-w-0")}>
+                <div className={head}>
+                  <h2 id="attention-title" className={title}>{t("attention")}</h2>
+                  <span className={hint}>{t("attentionHint")}</span>
                 </div>
-                <ul className="mt-3 flex flex-col gap-2.5">
+                <ul className="flex flex-col gap-2.5">
                   {watch.map((p) => (
                     <li key={p.key} className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                      <Link href={`/p/${p.key}/board`} className="min-w-0 truncate text-[13.5px] font-bold text-ink no-underline hover:underline">{p.name}</Link>
+                      <Link href={`/p/${p.key}/board`} title={p.name} className="min-w-0 truncate text-[13.5px] font-bold text-ink no-underline hover:underline">{p.name}</Link>
                       {(
                         [
                           ["overdue", p.overdue, "due=overdue", "bg-danger-soft text-danger"],
@@ -173,11 +182,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
                 </ul>
               </section>
             )}
-            <section aria-labelledby="mine-title" className={cx(panel, "min-w-0 overflow-hidden")}>
-              <div className="flex flex-wrap items-center justify-between gap-3 px-5 pt-4">
+            <section aria-labelledby="mine-title" className={cx(raised, "min-w-0 overflow-hidden")}>
+              <div className="flex flex-wrap items-center justify-between gap-3 px-6 pt-5.5">
                 <div className="flex flex-col gap-0.5">
-                  <h2 id="mine-title" className="text-base font-extrabold">{t("mine")}</h2>
-                  <span className="text-[13px] text-muted">{t("mineHint")}</span>
+                  <h2 id="mine-title" className="text-[17px] font-extrabold">{t("mine")}</h2>
+                  <span className={hint}>{t("mineHint")}</span>
                 </div>
                 <nav aria-label={t("mineViews")} className="flex gap-0.5 overflow-x-auto rounded-[11px] bg-well p-[3px]">
                   {views.map((v) => (
@@ -205,7 +214,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
                 </nav>
               </div>
               {items.length === 0 ? (
-                <p className="px-5 py-6 text-sm text-muted">
+                <p className="px-6 py-6 text-sm text-muted">
                   {counts.all === 0 ? (
                     <>
                       {t("noTickets")} <Link href={`/p/${projects[0].key}/board`}>{t("openBoard")}</Link>
@@ -215,36 +224,30 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
                   )}
                 </p>
               ) : (
-                <ul className="flex flex-col px-2 pb-2 pt-3">
+                <ul className="flex flex-col px-3 pb-3 pt-3">
                   {items.map((it) => {
                     const overdue = Boolean(it.due_date && it.due_date < today);
                     return (
-                      <li key={it.key} className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl px-3 py-3 hover:bg-paper">
+                      <li key={it.key} className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line-soft px-3 py-3 first:border-t-0 hover:bg-paper">
                         <span className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-well">
                           <TypeIcon type={it.type} label={tTypes(it.type)} className="size-4" />
                         </span>
                         {/* MSL-23: the title keeps 16rem; client, status and due wrap below it on a narrow column. */}
                         <div className="flex min-w-0 flex-[1_1_16rem] flex-col gap-0.5">
-                          <Link href={`/t/${it.key}`} className="truncate text-[14.5px] font-bold text-ink no-underline hover:text-ink hover:underline">{it.title}</Link>
-                          <span className="flex flex-wrap items-center gap-x-1.5 text-[12.5px] text-muted">
+                          <Link href={`/t/${it.key}`} title={it.title} className="truncate text-[14.5px] font-bold text-ink no-underline hover:text-ink hover:underline">{it.title}</Link>
+                          <span className="flex flex-wrap items-center gap-x-2.5 text-[12.5px] text-muted">
                             <Link href={`/t/${it.key}`} className="font-bold text-muted no-underline hover:text-ink">{it.key}</Link>
                             {(it.missing_reason || it.missing_menus) && (
                               <span role="img" title={t("missing")} aria-label={t("missing")} className="size-[7px] rounded-full bg-[#D97706]" />
                             )}
-                            <span aria-hidden="true">·</span>
                             {it.menu ? <span>{it.menu}</span> : <span className="font-semibold text-warn">{t("menuMissing")}</span>}
-                            {it.menu && it.missing_reason && (
-                              <>
-                                <span aria-hidden="true">·</span>
-                                <span className="font-semibold text-warn">{t("reasonMissing")}</span>
-                              </>
-                            )}
+                            {it.menu && it.missing_reason && <span className="font-semibold text-warn">{t("reasonMissing")}</span>}
                           </span>
                         </div>
                         <ClientChip client={it.client} coreLabel={t("core")} />
                         <span className="flex w-28 shrink-0 items-center gap-1.5 text-[13px] font-semibold text-ink-soft">
                           <StatusDot color={it.status.color} />
-                          <span className="truncate">{it.status.name}</span>
+                          <span title={it.status.name} className="truncate">{it.status.name}</span>
                         </span>
                         {(it.priority === "high" || it.priority === "urgent") && <PriorityChip priority={it.priority} label={tPri(it.priority)} />}
                         <span className={cx("w-20 shrink-0 text-right text-[12.5px]", overdue ? "font-semibold text-danger" : "text-muted")}>
@@ -264,7 +267,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
                 </ul>
               )}
               {mine.data?.next_cursor && (
-                <div className="border-t border-line-soft px-5 py-3">
+                <div className="border-t border-line-soft px-6 py-3">
                   <Link href={`/?${new URLSearchParams({ ...(view === "all" ? {} : { mine: view }), cursor: mine.data.next_cursor })}`} className={button.secondary}>
                     {t("more")}
                   </Link>
@@ -272,41 +275,43 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
               )}
             </section>
           </div>
-          <div className="flex flex-col gap-5">
-            <section aria-labelledby="recent-title" className={panel}>
-              <div className="flex flex-col gap-0.5 px-5 pb-2 pt-4">
-                <h2 id="recent-title" className="text-base font-extrabold">{t("recent")}</h2>
-                <span className="text-[13px] text-muted">{t("recentHint")}</span>
+          <div className="min-w-0">
+            <section aria-labelledby="recent-title" className={section}>
+              <div className={head}>
+                <h2 id="recent-title" className={title}>{t("recent")}</h2>
+                <span className={hint}>{t("recentHint")}</span>
               </div>
               {changes.length === 0 ? (
-                <p className="px-5 pb-5 pt-2 text-sm text-muted">{t("noChanges")}</p>
+                <p className="text-sm text-muted">{t("noChanges")}</p>
               ) : (
-                <ol className="flex flex-col px-2 pb-2">
+                <ol className="flex flex-col">
                   {changes.map((u) => (
-                    <li key={u.key} className="flex flex-col gap-0.5 rounded-xl px-3 py-2.5 hover:bg-paper">
+                    <li key={u.key} className="flex flex-col gap-0.5 border-b border-line py-2.5 first:pt-0 last:border-b-0">
                       <span className="flex min-w-0 items-baseline gap-2">
                         <Link href={`/t/${u.key}`} className="shrink-0 text-xs font-bold text-muted no-underline hover:text-ink">{u.key}</Link>
-                        <Link href={`/t/${u.key}`} className="truncate text-[13.5px] font-bold text-ink no-underline hover:text-ink hover:underline">{u.title}</Link>
+                        <Link href={`/t/${u.key}`} title={u.title} className="truncate text-[13.5px] font-bold text-ink no-underline hover:text-ink hover:underline">{u.title}</Link>
                       </span>
-                      <span className="text-xs text-muted">
-                        {u.change ? describeChange(ta, u.change, me.id) : t("changed")} · {ago(u.change?.at ?? u.updated_at)}
+                      <span className="flex gap-2 text-xs text-muted">
+                        <span className="min-w-0 break-words">{u.change ? describeChange(ta, u.change, me.id) : t("changed")}</span>
+                        <span className="shrink-0 whitespace-nowrap">{ago(u.change?.at ?? u.updated_at)}</span>
                       </span>
                     </li>
                   ))}
                 </ol>
               )}
             </section>
-            <section aria-labelledby="projects-title" className={panel}>
-              <h2 id="projects-title" className="px-5 pb-2 pt-4 text-base font-extrabold">{t("projects")}</h2>
-              <ul className="flex flex-col px-2 pb-2">
+            <section aria-labelledby="projects-title" className={section}>
+              <h2 id="projects-title" className={sectionHeading}>{t("projects")}</h2>
+              <ul className="flex flex-col">
                 {mineFirst.map((p) => (
-                  <li key={p.id}>
-                    <Link href={`/p/${p.key}/board`} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-ink no-underline hover:bg-paper hover:text-ink">
+                  <li key={p.id} className="border-b border-line py-2.5 first:pt-0 last:border-b-0">
+                    <Link href={`/p/${p.key}/board`} className="group flex items-center gap-3 text-ink no-underline hover:text-ink">
                       <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-[11px] font-extrabold text-accent-strong">{initials(p.name)}</span>
                       <span className="flex min-w-0 flex-1 flex-col">
-                        <span className="truncate text-[13.5px] font-bold">{p.name}</span>
-                        <span className="text-xs text-muted">
-                          {p.key} · {t("yourTickets", { count: perProject.get(p.key) ?? 0 })}
+                        <span title={p.name} className="truncate text-[13.5px] font-bold group-hover:underline">{p.name}</span>
+                        <span className="flex gap-2 text-xs text-muted">
+                          <span>{p.key}</span>
+                          <span>{t("yourTickets", { count: perProject.get(p.key) ?? 0 })}</span>
                         </span>
                       </span>
                       <Icon name="chevronRight" className="size-4 text-muted" />
@@ -315,10 +320,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
                 ))}
               </ul>
               {mineFirst.length < projects.length && (
-                <Link
-                  href="/projects"
-                  className="flex items-center justify-between border-t border-line-soft px-5 py-3 text-[13px] font-bold no-underline"
-                >
+                <Link href="/projects" className="flex items-center justify-between border-t border-line py-3 text-[13px] font-bold no-underline">
                   {t("allProjects", { count: projects.length })}
                   <Icon name="arrowRight" className="size-4" />
                 </Link>

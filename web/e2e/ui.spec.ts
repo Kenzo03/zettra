@@ -50,7 +50,7 @@ async function start(page: Page) {
     });
     expect(res.ok(), `attach ${name}: ${res.status()}`).toBeTruthy();
   };
-  return { ticket, attach };
+  return { ticket, attach, call, key, origin };
 }
 
 test("open ticket raises the Reason and keeps every control", async ({ page }) => {
@@ -150,4 +150,51 @@ test("sign-in has no card and shows the tagline", async ({ page }) => {
 
   // The shared helper still signs in through the same labels.
   await start(page);
+});
+
+test("Home raises My tickets only", async ({ page }) => {
+  const { ticket, call } = await start(page);
+  const me = await call("GET", "/me");
+  await ticket("Overtime approval skips the supervisor", { reason, assignee_id: me.id });
+
+  await page.goto("/");
+  const raised = page.locator(".surface-raised");
+  await expect(raised).toHaveCount(1);
+  await expect(raised).toContainText("Tiket saya");
+
+  // The Ask box is a plain field: neither it nor anything around it carries a shadow.
+  const ask = page.getByRole("search", { name: "Tanya" });
+  await expect(ask).toBeVisible();
+  await expect(ask.locator("xpath=ancestor-or-self::*[contains(@class,'shadow-')]")).toHaveCount(0);
+
+  // Everything else sits on the page.
+  for (const name of ["Baru diperbarui", "Proyek saya", "Perlu perhatian"]) {
+    const region = page.getByRole("region", { name });
+    if (name !== "Perlu perhatian") await expect(region).toBeVisible();
+    for (const one of await region.all()) await expect(one.locator(".surface-raised")).toHaveCount(0);
+  }
+});
+
+test("Home with no tickets keeps the raised list and its empty text", async ({ page, browser }) => {
+  const { call, key } = await start(page);
+  // A member with nothing assigned, so the empty list is certain whatever the admin has.
+  const run = Date.now().toString(36);
+  const email = `home-empty-${run}@example.com`;
+  const passphrase = "e2e-home-empty-passphrase-3";
+  const user = await call("POST", "/admin/users", { name: "Home Empty", email });
+  await call("PUT", `/projects/${key}/members`, {
+    members: [
+      { email: process.env.E2E_UI_ADMIN_EMAIL!, role: "admin", all_clients: true },
+      { email, role: "member", all_clients: true },
+    ],
+  });
+
+  const empty = await (await browser.newContext()).newPage();
+  await setPassword(empty, user.setup_link.url, passphrase);
+  await signIn(empty, email, passphrase);
+  const raised = empty.locator(".surface-raised");
+  await expect(raised).toHaveCount(1);
+  await expect(raised).toContainText("Tiket saya");
+  await expect(raised).toContainText("Belum ada tiket yang ditugaskan kepada Anda.");
+  await expect(raised.getByRole("link", { name: "Buka papan" })).toBeVisible();
 });
