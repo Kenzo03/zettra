@@ -334,3 +334,58 @@ test("answers are raised on the Ask page and flat in the panel", async ({ page }
   await expect(panel.getByRole("article", { name: question }).getByText("AI dimatikan.")).toBeVisible();
   await expect(panel.locator(".surface-raised")).toHaveCount(0);
 });
+
+test("views, panel and chips follow the URL", async ({ page }) => {
+  const { ticket, key } = await start(page);
+  const open = await ticket("Weekend overtime at double rate"); // open and without a reason, so the list below has a row
+
+  await page.goto(`/p/${key}/tickets?status=open&missing=reason`);
+  const views = page.getByRole("group", { name: "Tampilan" });
+  await expect(views.getByRole("link", { name: "Semua yang terbuka" })).toHaveAttribute("aria-pressed", "true");
+  await expect(views.getByRole("link", { name: "Terlambat" })).toHaveAttribute("aria-pressed", "false");
+  // Status and Missing are set inside the panel; All open already shows Status, so only Missing is a chip.
+  const filters = page.getByRole("button", { name: "Filter (2)" });
+  await expect(filters).toBeVisible();
+  const chip = page.getByRole("link", { name: "Hapus Belum diisi" });
+  await expect(page.getByRole("link", { name: /^Hapus / })).toHaveCount(1);
+  await expect(chip.locator("..")).toHaveText(/^Belum diisi\s*Tanpa alasan/); // the filter, then its choice
+
+  // The panel opens on the button and closes on Escape.
+  const form = page.getByRole("form", { name: "Saring tiket" });
+  const due = form.getByRole("combobox", { name: "Tenggat", exact: true });
+  await expect(due).toBeHidden();
+  await filters.click();
+  await expect(due).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(due).toBeHidden();
+
+  // The bulk controls wait for a ticked row.
+  await expect(page.getByText("Centang tiket untuk mengubahnya sekaligus.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Terapkan ke 0" })).toHaveCount(0);
+  await page.getByRole("checkbox", { name: `Pilih ${open.key}` }).check();
+  const bulk = page.getByRole("form", { name: "Ubah beberapa tiket" });
+  await expect(bulk.getByRole("button", { name: "Terapkan ke 1" })).toBeVisible();
+  await expect(bulk.getByRole("combobox", { name: "Prioritas" })).toBeVisible();
+
+  // The chip's × drops that one filter.
+  await chip.click();
+  await expect(page).not.toHaveURL(/[?&]missing=/);
+  await expect(page).toHaveURL(/[?&]status=open/);
+
+  // A view sets its filter and keeps the rest.
+  await views.getByRole("link", { name: "Terlambat" }).click();
+  await expect(page).toHaveURL(/[?&]due=overdue/);
+  await expect(page).toHaveURL(/[?&]status=open/);
+  // The panel's picks follow the URL, so the next change keeps what the view set.
+  await page.getByRole("button", { name: /^Filter/ }).click();
+  await expect(due).toHaveValue("overdue");
+  await form.getByRole("combobox", { name: "Penerimaan", exact: true }).selectOption({ label: "Sudah diterima" });
+  await expect(page).toHaveURL(/[?&]accepted=yes/);
+  await expect(page).toHaveURL(/[?&]due=overdue/);
+
+  // The Board shows every status, so it has no status views.
+  await page.goto(`/p/${key}/board`);
+  const boardViews = page.getByRole("group", { name: "Tampilan" });
+  await expect(boardViews.getByRole("link", { name: "Hanya milik saya" })).toBeVisible();
+  await expect(boardViews.getByRole("link", { name: "Semua yang terbuka" })).toHaveCount(0);
+});

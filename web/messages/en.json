@@ -629,7 +629,9 @@
     "sortDue": "Due date",
     "apply": "Apply",
     "reset": "Reset",
-    "anyLabel": "Any label"
+    "anyLabel": "Any label",
+    "views": "Views",
+    "remove": "Remove {label}"
   },
   "board": {
     "newTicket": "New ticket",

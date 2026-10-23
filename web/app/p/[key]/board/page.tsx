@@ -9,7 +9,7 @@ import TicketFilters from "@/components/TicketFilters";
 import { dateIn } from "@/lib/format";
 import { getProject, serverApi } from "@/lib/server-api";
 import { one, ticketQuery } from "@/lib/ticket-query";
-import { cx, panel } from "@/lib/ui";
+import { cx, section } from "@/lib/ui";
 import Board from "./Board";
 import SetupClose from "./SetupClose";
 
@@ -74,7 +74,7 @@ export default async function BoardPage({
       </PageBar>
       <main className="px-4 py-4 md:px-5">
         {st && !setupHidden && !(st.clients && st.team && st.tree && st.tickets) && (
-          <section aria-labelledby="project-setup" className={cx(panel, "mb-4 flex flex-col gap-3 px-5 py-4")}>
+          <section aria-labelledby="project-setup" className={cx(section, "mb-5 flex flex-col gap-3")}>
             <div className="flex items-start gap-3">
               <div className="flex flex-1 flex-col gap-0.5">
                 <h2 id="project-setup" className="text-base font-extrabold">{ts("title")}</h2>

@@ -20,7 +20,7 @@ test("section and rail sit on the page: lines, no box, no shadow", () => {
 });
 
 test("buttons press in and fade colours, and reduced motion turns the press off", () => {
-  for (const name of ["primary", "secondary", "danger"] as const) {
+  for (const name of ["primary", "secondary", "danger", "on"] as const) {
     const b = button[name];
     assert.match(b, /active:scale-\[0\.97\]/, name);
     assert.match(b, /motion-reduce:active:scale-100/, name);

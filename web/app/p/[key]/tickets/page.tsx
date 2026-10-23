@@ -5,7 +5,7 @@ import { Avatar, ClientChip, PriorityChip, StatusDot, TypeIcon, showsClients } f
 import Icon from "@/components/Icon";
 import { LiveRefresh } from "@/components/LiveEvents";
 import PageBar from "@/components/PageBar";
-import TicketFilters from "@/components/TicketFilters";
+import TicketFilters, { TicketSort } from "@/components/TicketFilters";
 import { dateIn, dateTime, day, dayOf } from "@/lib/format";
 import { getProject, serverApi } from "@/lib/server-api";
 import { one, ticketQuery } from "@/lib/ticket-query";
@@ -47,21 +47,14 @@ export default async function TicketsPage({
   const next = page.data?.next_cursor;
   const { cursor: _, ...kept } = values;
   const today = dateIn(new Date(), timeZone);
+  const action = `/p/${key}/tickets`;
+  const bulk = canEdit && items.length > 0;
   return (
     <>
       <PageBar>
         <h1 className="text-base font-semibold">{tp("tickets")}</h1>
         <span className="mr-2 text-[13px] text-muted">{project.name}</span>
-        <TicketFilters
-          action={`/p/${key}/tickets`}
-          values={values}
-          clients={clients.data?.items ?? []}
-          assignees={assignees.data?.items ?? []}
-          statuses={statuses.data?.items ?? []}
-          labels={(labels.data?.items ?? []).map((l) => l.label)}
-          releases={releases.data?.items ?? []}
-        />
-        <a href={`/api/v1/projects/${key}/tickets?${new URLSearchParams({ ...exportQuery(ticketQuery(values)), format: "csv" })}`} download className={button.secondary}>
+        <a href={`/api/v1/projects/${key}/tickets?${new URLSearchParams({ ...exportQuery(ticketQuery(values)), format: "csv" })}`} download className={cx(button.secondary, "ml-auto")}>
           <Icon name="download" />
           {t("exportCsv")}
         </a>
@@ -71,10 +64,23 @@ export default async function TicketsPage({
             {t("importTickets")}
           </Link>
         )}
+        <TicketFilters
+          action={action}
+          values={values}
+          clients={clients.data?.items ?? []}
+          assignees={assignees.data?.items ?? []}
+          statuses={statuses.data?.items ?? []}
+          labels={(labels.data?.items ?? []).map((l) => l.label)}
+          releases={releases.data?.items ?? []}
+        />
       </PageBar>
       <main className="flex flex-col gap-3 px-4 py-4 md:px-5">
         <LiveRefresh />
-        {canEdit && items.length > 0 && <BulkBar people={assignees.data?.items ?? []} statuses={statuses.data?.items ?? []} releases={releases.data?.items ?? []} />}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          {bulk && <p className="text-[13px] text-muted">{t("bulk.hint")}</p>}
+          <TicketSort action={action} value={values.sort} />
+        </div>
+        {bulk && <BulkBar people={assignees.data?.items ?? []} statuses={statuses.data?.items ?? []} releases={releases.data?.items ?? []} />}
         {items.length === 0 ? (
           <p className="text-muted">{t("none")}</p>
         ) : (

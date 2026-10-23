@@ -10,6 +10,8 @@ export const button = {
   primary: `${buttonBase} bg-accent text-white shadow-[0_1px_2px_rgba(120,40,20,0.25)] hover:bg-accent-strong hover:text-white`,
   secondary: `${buttonBase} border border-line bg-white text-ink hover:bg-paper hover:text-ink`,
   danger: `${buttonBase} border border-danger-line bg-white text-danger hover:bg-danger-soft hover:text-danger`,
+  // A secondary button that shows something is on, such as Filters with filters set.
+  on: `${buttonBase} border border-accent bg-accent-soft text-accent-strong hover:text-accent-strong`,
   // Looks like a link, acts like a button.
   quiet: "inline-flex cursor-pointer items-center gap-1 text-[13px] font-semibold text-link transition-colors duration-150 hover:text-link-hover hover:underline disabled:opacity-40",
 };
