@@ -5,7 +5,28 @@ import { useTranslations } from "next-intl";
 import Answer, { type Chip, type Turn } from "@/components/ask/Answer";
 import AskView from "@/components/ask/AskView";
 import { api } from "@/lib/api";
-import { button } from "@/lib/ui";
+import { button, cx } from "@/lib/ui";
+
+// Hides the open thread; the page puts it beside the title.
+export function HideThread({ threadId }: { threadId: number }) {
+  const t = useTranslations("ask");
+  const router = useRouter();
+  return (
+    <button
+      type="button"
+      className={cx(button.quiet, "ml-auto")}
+      onClick={async () => {
+        const { error } = await api.DELETE("/ask/threads/{id}", { params: { path: { id: threadId } } });
+        if (!error) {
+          router.push("/ask");
+          router.refresh();
+        }
+      }}
+    >
+      {t("hideThread")}
+    </button>
+  );
+}
 
 // The open thread: its saved answers, then the Ask box for more questions.
 export default function AskPage({
@@ -21,29 +42,11 @@ export default function AskPage({
   question?: string;
   examples?: string[];
 }) {
-  const t = useTranslations("ask");
   const router = useRouter();
   return (
-    <div className="flex flex-col gap-4">
-      {threadId && (
-        <div className="flex max-w-3xl justify-end">
-          <button
-            type="button"
-            className={button.quiet}
-            onClick={async () => {
-              const { error } = await api.DELETE("/ask/threads/{id}", { params: { path: { id: threadId } } });
-              if (!error) {
-                router.push("/ask");
-                router.refresh();
-              }
-            }}
-          >
-            {t("hideThread")}
-          </button>
-        </div>
-      )}
+    <div className="flex flex-col gap-6">
       {history.length > 0 && (
-        <div className="flex max-w-3xl flex-col gap-4">
+        <div className="flex max-w-3xl flex-col gap-6">
           {history.map((turn, i) => (
             <Answer key={i} turn={turn} />
           ))}

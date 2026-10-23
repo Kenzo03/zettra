@@ -204,3 +204,35 @@ test("Home with no tickets keeps the raised list and its empty text", async ({ p
   await expect(raised).toContainText("Belum ada tiket yang ditugaskan kepada Anda.");
   await expect(raised.getByRole("link", { name: "Buka papan" })).toBeVisible();
 });
+
+test("answers are raised on the Ask page and flat in the panel", async ({ page }) => {
+  await start(page);
+  const question = "Apa yang berubah bulan lalu?";
+
+  // A new thread with its examples has no answer, so nothing is raised.
+  await page.goto("/ask");
+  await expect(page.getByRole("heading", { level: 1, name: "Tanya" })).toBeVisible();
+  const raised = page.locator(".surface-raised");
+  await expect(raised).toHaveCount(0);
+
+  // The Ask field is a plain field: neither it nor anything around it carries a shadow.
+  const form = page.getByRole("form", { name: "Tanya" });
+  await expect(form.locator("xpath=ancestor-or-self::*[contains(@class,'shadow-')]")).toHaveCount(0);
+
+  // With AI off the keyword path still answers, and the answer is the page's one card.
+  await form.getByLabel("Pertanyaan").fill(question);
+  await form.getByRole("button", { name: "Tanya" }).click();
+  const answer = page.getByRole("article", { name: question });
+  await expect(answer.getByText("AI dimatikan.")).toBeVisible();
+  await expect(answer.locator(".surface-raised")).toHaveCount(1);
+  await expect(raised).toHaveCount(1);
+
+  // The slide-over floats already, so its answers stay flat.
+  await page.goto("/");
+  await page.getByRole("banner").getByRole("button", { name: "Tanya" }).click();
+  const panel = page.getByRole("dialog", { name: "Tanya" });
+  await panel.getByLabel("Pertanyaan").fill(question);
+  await panel.getByRole("button", { name: "Tanya", exact: true }).click();
+  await expect(panel.getByRole("article", { name: question }).getByText("AI dimatikan.")).toBeVisible();
+  await expect(panel.locator(".surface-raised")).toHaveCount(0);
+});
