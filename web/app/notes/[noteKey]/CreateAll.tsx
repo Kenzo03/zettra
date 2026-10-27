@@ -32,7 +32,7 @@ export default function CreateAll({ projectKey, tickets }: { projectKey: string;
   }
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="mt-3 flex flex-col items-start gap-1">
       <button type="button" onClick={createAll} disabled={busy !== ""} className={button.secondary}>
         {busy || t("createAll", { count: tickets.length })}
       </button>

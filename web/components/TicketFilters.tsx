@@ -72,7 +72,7 @@ export default async function TicketFilters({ action, values, clients, assignees
         className={cx(
           field.compact,
           "w-full",
-          chip && "md:h-full md:w-auto md:cursor-pointer md:border-0 md:bg-transparent md:px-0 md:text-[13.5px] md:font-medium md:text-muted md:outline-none",
+          chip && "md:h-full md:w-auto md:field-sizing-content md:cursor-pointer md:border-0 md:bg-transparent md:px-0 md:text-[13.5px] md:font-medium md:text-muted md:outline-none",
         )}
       >
         {f.options.map(([v, text]) => (

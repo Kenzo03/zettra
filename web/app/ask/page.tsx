@@ -82,6 +82,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
                 <Link
                   href={`/ask?thread=${th.id}`}
                   aria-current={th.id === threadId ? "page" : undefined}
+                  title={th.title}
                   className={cx(
                     "block truncate rounded-xl px-3 py-2.5 no-underline",
                     th.id === threadId

@@ -409,7 +409,7 @@ export default function ModuleTree({ projectKey, nodes, clients, canEdit, showAr
   }
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-10 md:grid-cols-[minmax(0,560px)_minmax(0,1fr)]">
+    <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-10 lg:grid-cols-[minmax(0,560px)_minmax(20rem,1fr)]">
       <section aria-label={t("tree")} className={raised}>
         <div className="flex flex-wrap items-center gap-2 border-b border-line-soft p-3">
           <label className="flex h-9 min-w-40 flex-1 items-center gap-2 rounded-[10px] border border-line bg-paper px-3 text-muted focus-within:bg-white focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent">

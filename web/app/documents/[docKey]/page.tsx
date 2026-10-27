@@ -35,7 +35,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ docKe
   return (
     <>
       <PageBar>
-        <div className="flex min-w-0 flex-1 basis-full flex-col gap-1 md:basis-0">
+        <div className="flex min-w-0 flex-1 basis-full flex-col gap-1 md:min-w-64 md:basis-0">
           <nav aria-label={tt("path")} className="flex items-center gap-1.5 text-[13px] text-muted">
             <Link href={`/p/${doc.project_key}/board`}>{doc.project_key}</Link>
             <Icon name="chevronRight" className="size-3.5" />

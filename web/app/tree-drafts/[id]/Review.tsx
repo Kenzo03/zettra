@@ -128,7 +128,7 @@ export default function Review({ initial, projectKey, sections }: { initial: Dra
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-well" aria-hidden>
           <div
-            className="h-full origin-left animate-pulse rounded-full bg-accent transition-transform duration-500 motion-reduce:transition-none"
+            className="h-full origin-left animate-pulse rounded-full bg-accent transition-transform duration-500 motion-reduce:animate-none motion-reduce:transition-none"
             style={{ transform: `scaleX(${Math.max(pct, 8) / 100})` }}
           />
         </div>

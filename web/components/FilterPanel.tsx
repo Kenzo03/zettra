@@ -22,7 +22,8 @@ const subscribe = (change: () => void) => {
 
 // The filter bar's "Filters" button and the panel it opens. The panel floats
 // under the bar's row (its containing block) and stays in the form while
-// closed, so its selects still apply; Escape or a click outside closes it.
+// closed, so its selects still apply; Escape, a click outside or focus moving
+// out (it would cover what gets focus) closes it.
 export default function FilterPanel({ count, narrowCount, picks, footer, children }: Props) {
   const t = useTranslations("ticketFilters");
   const id = useId();
@@ -41,7 +42,7 @@ export default function FilterPanel({ count, narrowCount, picks, footer, childre
   }, [open]);
   useEffect(() => {
     if (!open) return;
-    const onPointer = (e: PointerEvent) => {
+    const onOutside = (e: Event) => {
       const at = e.target as Node;
       if (!panel.current?.contains(at) && !toggle.current?.contains(at)) setOpen(false);
     };
@@ -50,10 +51,12 @@ export default function FilterPanel({ count, narrowCount, picks, footer, childre
       setOpen(false);
       toggle.current?.focus();
     };
-    document.addEventListener("pointerdown", onPointer);
+    document.addEventListener("pointerdown", onOutside);
+    document.addEventListener("focusin", onOutside);
     document.addEventListener("keydown", onKey);
     return () => {
-      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("pointerdown", onOutside);
+      document.removeEventListener("focusin", onOutside);
       document.removeEventListener("keydown", onKey);
     };
   }, [open]);

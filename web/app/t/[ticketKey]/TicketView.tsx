@@ -175,7 +175,7 @@ export default function TicketView({ ticket, statuses, clients, nodes, assignees
                   </span>
                 </div>
                 {ticket.reason ? (
-                  <p className={cx("whitespace-pre-wrap [text-wrap:pretty]", raiseReason ? "text-[19px] font-bold leading-[1.4] tracking-[-0.01em]" : "text-[18px] font-medium leading-normal")}>{ticket.reason}</p>
+                  <p className={cx("whitespace-pre-wrap break-words [text-wrap:pretty]", raiseReason ? "text-[19px] font-bold leading-[1.4] tracking-[-0.01em]" : "text-[18px] font-medium leading-normal")}>{ticket.reason}</p>
                 ) : (
                   <p className={cx("text-muted", raiseReason ? "text-[19px] font-bold" : "text-[18px] font-medium")}>{t("none")}</p>
                 )}

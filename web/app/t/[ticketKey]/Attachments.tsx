@@ -84,5 +84,5 @@ export default function Attachments({ ticketKey, files, meId, isProjectAdmin, ca
   );
 }
 
-// The tag on a file: its extension in lower case, empty for a name without one.
-const extension = (name: string) => (name.includes(".") ? name.split(".").pop()!.toLowerCase() : "");
+// The tag on a file: its extension in lower case, cut to what fits the tile, empty for a name without one.
+const extension = (name: string) => (name.includes(".") ? name.split(".").pop()!.toLowerCase().slice(0, 4) : "");

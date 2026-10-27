@@ -407,6 +407,10 @@ test("views, panel and chips follow the URL", async ({ page }) => {
   await expect(due).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(due).toBeHidden();
+  // Focus moving out closes it too, so it never covers what gets focus.
+  await filters.click();
+  await chip.focus();
+  await expect(due).toBeHidden();
 
   // The bulk controls wait for a ticked row.
   await expect(page.getByText("Centang tiket untuk mengubahnya sekaligus.")).toBeVisible();
