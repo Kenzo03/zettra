@@ -26,8 +26,8 @@ export function ClientChip({ client, coreLabel }: { client?: Ref | null; coreLab
 const priorityTone: Record<Priority, string> = {
   urgent: "bg-danger-soft text-danger",
   high: "bg-[#FBE8D0] text-[#874700]",
-  medium: "bg-ground text-[#4A423C]",
-  low: "bg-ground text-muted",
+  medium: "bg-well text-[#4A423C]",
+  low: "bg-well text-muted",
 };
 
 export function PriorityChip({ priority, label }: { priority: Priority; label: string }) {

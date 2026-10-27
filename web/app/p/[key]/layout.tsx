@@ -11,7 +11,7 @@ export default async function ProjectLayout({ children, params }: { children: Re
   return (
     <>
       {project?.archived_at && (
-        <div role="status" className="mx-4 mb-2 flex flex-wrap items-center gap-3 rounded-xl bg-warn-soft px-4 py-3 text-[13px] text-warn md:mx-5 print:hidden">
+        <div role="status" className="mx-4 mb-2 flex flex-wrap items-center gap-3 rounded-xl bg-warn-soft px-4 py-3 text-[13px] text-warn md:mx-5 print:hidden [&_button]:border-warn-line">
           <span className="flex-1">{t("banner")}</span>
           {project.can_restore && <ArchiveButton projectKey={key} name={project.name} archived />}
         </div>
