@@ -1,10 +1,10 @@
 // Class lists of the Terakota Lembut design's building blocks, shared by every
-// screen so buttons, fields and panels look the same everywhere.
+// screen so buttons, fields and cards look the same everywhere.
 
 export const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(" ");
 
 const buttonBase =
-  "inline-flex h-9 shrink-0 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-[10px] px-3.5 text-[13.5px] font-semibold no-underline transition-[color,background-color,border-color,scale] duration-150 ease-out active:scale-[0.97] motion-reduce:active:scale-100 disabled:cursor-default disabled:opacity-40";
+  "inline-flex h-9 shrink-0 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-[10px] px-3.5 text-[13.5px] font-semibold no-underline transition-[color,background-color,border-color,scale] duration-150 ease-out active:scale-[0.97] motion-reduce:active:scale-100 disabled:active:scale-100 disabled:cursor-default disabled:opacity-40";
 
 export const button = {
   primary: `${buttonBase} bg-accent text-white shadow-[0_1px_2px_rgba(120,40,20,0.25)] hover:bg-accent-strong hover:text-white`,
@@ -26,11 +26,6 @@ export const field = {
   error: "text-[13px] text-danger",
 };
 
-// Cards float on the ground with a faint line and a soft shadow.
-const lift = "shadow-[0_1px_2px_rgba(43,36,32,0.04),0_4px_16px_rgba(43,36,32,0.04)]";
-
-export const panel = `rounded-2xl border border-line bg-white ${lift}`;
-
 // The one raised card a page may have. `surface-raised` carries no styles; it is
 // the hook the e2e specs count. Callers add their own padding (the ticket and Home
 // cards use `px-6 py-5.5`).
@@ -49,16 +44,18 @@ export const rail = {
   label: "text-muted",
   value: "min-w-0 font-semibold",
 };
+
 export const chip = "inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2 text-[11.5px] font-semibold leading-[22px]";
 // A radio or checkbox drawn as a pill; its box stays visible, so the choice reads at a glance.
 export const choice =
   "flex h-10 cursor-pointer items-center gap-2 rounded-full border border-line bg-white px-3.5 text-[13px] font-semibold text-ink-soft hover:border-field has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:checked]:text-accent-strong [&>input]:size-3.5 [&>input]:accent-accent";
 export const sectionTitle = "text-[13px] font-bold text-muted";
 
+// `relative` keeps a sr-only header inside the scroll box, so it cannot widen a phone page.
 export const table = {
-  wrap: `overflow-x-auto ${raised}`,
+  wrap: `relative overflow-x-auto ${raised}`,
   // The same table with no lift, for a page whose one raised card is elsewhere.
-  plain: "overflow-x-auto rounded-2xl border border-line bg-white",
+  plain: "relative overflow-x-auto rounded-2xl border border-line bg-white",
   table: "w-full border-collapse text-left text-[13px]",
   head: "border-b border-line bg-paper text-xs text-muted",
   th: "px-3.5 py-2.5 font-semibold",

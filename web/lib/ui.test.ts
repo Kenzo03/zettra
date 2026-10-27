@@ -17,6 +17,8 @@ test("section and rail sit on the page: lines, no box, no shadow", () => {
   assert.match(rail.row, /\bborder-b\b/);
   assert.match(table.wrap, /\bsurface-raised\b/);
   assert.doesNotMatch(table.plain, /shadow-|surface-raised/);
+  // A sr-only header is absolutely placed; without a positioned box it widens a phone page.
+  for (const t of [table.wrap, table.plain]) assert.ok(t.split(" ").includes("relative"), t);
 });
 
 test("buttons press in and fade colours, and reduced motion turns the press off", () => {
@@ -25,6 +27,8 @@ test("buttons press in and fade colours, and reduced motion turns the press off"
     assert.match(b, /active:scale-\[0\.97\]/, name);
     assert.match(b, /motion-reduce:active:scale-100/, name);
     assert.match(b, /duration-150/, name);
+    assert.match(b, /transition-\[color,background-color,border-color,scale\] duration-150 ease-out/, name);
+    assert.match(b, /disabled:active:scale-100/, name);
   }
   assert.match(button.quiet, /transition-colors/);
 });

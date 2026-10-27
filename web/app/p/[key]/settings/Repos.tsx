@@ -76,8 +76,7 @@ export default function Repos({ projectKey, repos }: { projectKey: string; repos
       {repos.length === 0 ? (
         <p className="text-sm text-muted">{t("none")}</p>
       ) : (
-        // `relative` keeps the sr-only Actions heading inside the scroll box, so it cannot widen a phone page.
-        <div className={cx(table.plain, "relative")}>
+        <div className={table.plain}>
           <table className={table.table}>
             <thead className={table.head}>
               <tr>
