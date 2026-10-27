@@ -20,11 +20,11 @@ const components: Components = {
   ul: ({ children }) => <ul className="my-1.5 list-disc pl-5">{children}</ul>,
   ol: ({ children }) => <ol className="my-1.5 list-decimal pl-5">{children}</ol>,
   blockquote: ({ children }) => <blockquote className="my-1.5 border-l-2 border-line pl-3 text-muted">{children}</blockquote>,
-  code: ({ children, className }) => <code className={cx("rounded bg-paper px-1 font-mono text-[12.5px]", className)}>{children}</code>,
-  pre: ({ children }) => <pre className="my-2 overflow-x-auto rounded border border-line-soft bg-paper p-2.5 [&_code]:bg-transparent [&_code]:p-0">{children}</pre>,
+  code: ({ children, className }) => <code className={cx("rounded bg-well px-1 font-mono text-[12.5px]", className)}>{children}</code>,
+  pre: ({ children }) => <pre className="my-2 overflow-x-auto rounded border border-line bg-white p-2.5 [&_code]:bg-transparent [&_code]:p-0">{children}</pre>,
   table: ({ children }) => (
     <div className="my-2 overflow-x-auto">
-      <table className="border-collapse text-[13px] [&_td]:border [&_td]:border-line [&_td]:px-2 [&_td]:py-1 [&_th]:border [&_th]:border-line [&_th]:bg-paper [&_th]:px-2 [&_th]:py-1 [&_th]:text-left">{children}</table>
+      <table className="border-collapse text-[13px] [&_td]:border [&_td]:border-line [&_td]:px-2 [&_td]:py-1 [&_th]:border [&_th]:border-line [&_th]:bg-well [&_th]:px-2 [&_th]:py-1 [&_th]:text-left">{children}</table>
     </div>
   ),
   a: ({ href, children }) => {

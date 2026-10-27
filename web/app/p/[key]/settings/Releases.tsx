@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { api } from "@/lib/api";
 import type { components } from "@/lib/api-types";
 import { useProblemText } from "@/lib/problem";
-import { button, cx, field, panel, sectionTitle } from "@/lib/ui";
+import { button, cx, field, section } from "@/lib/ui";
 
 type Release = components["schemas"]["Release"];
 
@@ -37,9 +37,11 @@ export default function Releases({ projectKey, releases }: { projectKey: string;
   }
 
   return (
-    <section aria-labelledby="releases-title" className={cx(panel, "flex flex-col gap-3 p-4")}>
-      <h2 id="releases-title" className={sectionTitle}>{t("title")}</h2>
-      <p className="text-[13px] text-muted">{t("intro")}</p>
+    <section aria-labelledby="releases-title" className={cx(section, "flex flex-col gap-3")}>
+      <div>
+        <h2 id="releases-title" className="text-base font-extrabold">{t("title")}</h2>
+        <p className={cx(field.hint, "mt-1")}>{t("intro")}</p>
+      </div>
       {releases.map((r) => (
         <form key={r.id} onSubmit={(e) => save(e, r.id)} aria-label={r.name} className="flex flex-wrap items-end gap-2">
           <label htmlFor={`release-${r.id}-name`} className={field.label}>

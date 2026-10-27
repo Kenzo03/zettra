@@ -37,7 +37,7 @@ export default async function SummariesPage({ params }: { params: Promise<{ key:
           <Link href={`/p/${key}/summaries/new`} className={button.primary}>{t("new")}</Link>
         )}
       </PageBar>
-      <main className="flex flex-col gap-3 px-4 py-4 md:px-5">
+      <main className="flex flex-col gap-5 px-4 py-4 md:px-5">
         <p className="text-[13px] text-muted">{t("intro")}</p>
         {admin && <Schedules projectKey={key} clients={clients?.data?.items ?? []} schedules={schedules?.data?.items ?? []} />}
         {items.length === 0 ? (

@@ -14,6 +14,8 @@
   },
   "login": {
     "title": "Masuk ke Zettra",
+    "tagline": "Alasan di balik setiap layar.",
+    "footer": "Dihosting sendiri. Minta akun ke admin Anda.",
     "email": "Email",
     "password": "Kata sandi",
     "submit": "Masuk",
@@ -627,7 +629,9 @@
     "sortDue": "Tenggat",
     "apply": "Terapkan",
     "reset": "Atur ulang",
-    "anyLabel": "Label apa saja"
+    "anyLabel": "Label apa saja",
+    "views": "Tampilan",
+    "remove": "Hapus {label}"
   },
   "board": {
     "newTicket": "Tiket baru",

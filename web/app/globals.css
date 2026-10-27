@@ -43,6 +43,7 @@
   }
   a {
     color: var(--color-link);
+    transition: color 150ms ease-out;
   }
   a:hover {
     color: var(--color-link-hover);

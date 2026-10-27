@@ -3,10 +3,9 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import type { Chip, Turn } from "@/components/ask/Answer";
 import Icon from "@/components/Icon";
-import PageBar from "@/components/PageBar";
 import { getMe, getProject, serverApi } from "@/lib/server-api";
 import { button, cx } from "@/lib/ui";
-import AskPage from "./AskPage";
+import AskPage, { HideThread } from "./AskPage";
 
 type Search = Record<string, string | string[] | undefined>;
 const list = (v: string | string[] | undefined) => (Array.isArray(v) ? v : v ? [v] : []);
@@ -59,45 +58,48 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
     if (client) chips.push({ kind: "client", id: client.id, label: client.name });
   }
 
+  const openThread = detail?.data ? threadId : undefined;
+
   return (
-    <>
-      <PageBar>
-        <h1 className="text-base font-semibold">{t("title")}</h1>
-      </PageBar>
-      {/* MSL-42: side by side from lg; beside the thread list, a tablet's answer column was too narrow and overflowed. */}
-      <div className="flex flex-col gap-4 p-4 md:p-5 lg:flex-row">
-        <aside aria-label={t("threads")} className="flex w-full shrink-0 flex-col gap-3 lg:w-64">
-          <Link href="/ask" className={button.secondary}>
-            <Icon name="plus" className="size-4 text-accent" />
-            {t("newThread")}
-          </Link>
-          {(threads.data?.items ?? []).length === 0 ? (
-            <p className="text-[13px] text-muted">{t("noThreads")}</p>
-          ) : (
-            <ul className="flex max-h-56 flex-col gap-0.5 overflow-y-auto text-[13.5px] lg:max-h-none">
-              {threads.data?.items.map((th) => (
-                <li key={th.id}>
-                  <Link
-                    href={`/ask?thread=${th.id}`}
-                    aria-current={th.id === threadId ? "page" : undefined}
-                    className={cx(
-                      "block truncate rounded-xl px-3 py-2.5 no-underline",
-                      th.id === threadId
-                        ? "bg-white font-bold text-ink shadow-[0_1px_2px_rgba(43,36,32,0.08),0_0_0_1px_rgba(43,36,32,0.05)] hover:text-ink"
-                        : "font-medium text-ink-soft hover:bg-white/70 hover:text-ink",
-                    )}
-                  >
-                    {th.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </aside>
-        <main className="min-w-0 flex-1">
-          <AskPage key={threadId ?? "new"} threadId={detail?.data ? threadId : undefined} history={history} chips={chips} question={question} examples={examples} />
-        </main>
+    // MSL-42: side by side from lg; beside the thread list, a tablet's answer column was too narrow and overflowed.
+    // The title and Hide thread head the answer column, but come first in the page, so a phone reads them before the thread list.
+    <div className="flex flex-col gap-4 px-4 pb-4 pt-1 md:px-5 md:pb-5 lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:grid-rows-[auto_1fr]">
+      <div className="flex max-w-3xl items-center gap-3 lg:col-start-2 lg:row-start-1">
+        <h1 className="text-[22px] font-extrabold tracking-[-0.02em]">{t("title")}</h1>
+        {openThread && <HideThread threadId={openThread} />}
       </div>
-    </>
+      <aside aria-label={t("threads")} className="flex flex-col gap-3 lg:col-start-1 lg:row-span-2 lg:row-start-1">
+        <Link href="/ask" className={button.secondary}>
+          <Icon name="plus" className="size-4 text-accent" />
+          {t("newThread")}
+        </Link>
+        {(threads.data?.items ?? []).length === 0 ? (
+          <p className="text-[13px] text-muted">{t("noThreads")}</p>
+        ) : (
+          <ul className="flex max-h-56 flex-col gap-0.5 overflow-y-auto text-[13.5px] lg:max-h-none">
+            {threads.data?.items.map((th) => (
+              <li key={th.id}>
+                <Link
+                  href={`/ask?thread=${th.id}`}
+                  aria-current={th.id === threadId ? "page" : undefined}
+                  title={th.title}
+                  className={cx(
+                    "block truncate rounded-xl px-3 py-2.5 no-underline transition-colors duration-150",
+                    th.id === threadId
+                      ? "bg-white font-bold text-ink shadow-[0_1px_2px_rgba(43,36,32,0.08),0_0_0_1px_rgba(43,36,32,0.05)] hover:text-ink"
+                      : "font-medium text-ink-soft hover:bg-white/70 hover:text-ink",
+                  )}
+                >
+                  {th.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </aside>
+      <main className="min-w-0 lg:col-start-2">
+        <AskPage key={threadId ?? "new"} threadId={openThread} history={history} chips={chips} question={question} examples={examples} />
+      </main>
+    </div>
   );
 }

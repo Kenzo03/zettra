@@ -7,7 +7,7 @@ import Icon from "@/components/Icon";
 import { api } from "@/lib/api";
 import { fileSize } from "@/lib/format";
 import { useProblemText, type Ticket } from "@/lib/problem";
-import { button, cx, field, panel } from "@/lib/ui";
+import { button, cx, field, section, sectionHeading } from "@/lib/ui";
 
 type Props = { ticketKey: string; files: Ticket["attachments"]; meId: number; isProjectAdmin: boolean; canUpload: boolean };
 
@@ -42,19 +42,23 @@ export default function Attachments({ ticketKey, files, meId, isProjectAdmin, ca
   }
 
   return (
-    <section aria-labelledby="attachments-title" className={cx(panel, "flex flex-col gap-3 px-5 py-4")}>
-      <h2 id="attachments-title" className="text-sm font-extrabold">{t("title")}</h2>
+    <section aria-labelledby="attachments-title" className={section}>
+      <h2 id="attachments-title" className={sectionHeading}>{t("title")}</h2>
       {files.length === 0 ? (
         <p className="text-[13px] text-muted">{t("none")}</p>
       ) : (
-        <ul className="flex flex-col gap-2 text-[13px]">
+        <ul className="flex flex-col gap-2.5 text-[13px]">
           {files.map((f) => (
-            <li key={f.id} className="flex items-center gap-2">
-              <Icon name="file" className="size-4 text-muted" />
-              <a href={`/api/v1/attachments/${f.id}`} className="min-w-0 truncate">{f.filename}</a>
-              <span className="shrink-0 text-xs text-muted">{fileSize(f.size_bytes)}</span>
+            <li key={f.id} className="flex min-w-0 items-center gap-2.5">
+              <span aria-hidden className="flex size-[34px] shrink-0 items-center justify-center rounded-lg bg-well text-[10.5px] font-bold text-ink-soft">
+                {extension(f.filename) || <Icon name="file" className="size-4" />}
+              </span>
+              <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <a href={`/api/v1/attachments/${f.id}`} title={f.filename} className="truncate font-semibold leading-snug">{f.filename}</a>
+                <span className="text-xs text-muted">{fileSize(f.size_bytes)}</span>
+              </span>
               {canUpload && (f.uploader.id === meId || isProjectAdmin) && (
-                <button type="button" onClick={() => remove(f.id)} className={cx(button.quiet, "ml-auto text-xs")}>{t("remove")}</button>
+                <button type="button" onClick={() => remove(f.id)} className={cx(button.quiet, "shrink-0 text-xs")}>{t("remove")}</button>
               )}
             </li>
           ))}
@@ -63,19 +67,22 @@ export default function Attachments({ ticketKey, files, meId, isProjectAdmin, ca
       {canUpload && (
         <label
           className={cx(
-            "flex cursor-pointer flex-col items-center gap-2 rounded-xl border-[1.5px] border-dashed border-field bg-paper px-3 py-4 text-[13.5px] font-semibold text-ink hover:border-accent focus-within:border-accent",
+            "mt-3 flex cursor-pointer flex-row items-center justify-center gap-2.5 rounded-xl border-[1.5px] border-dashed border-field bg-paper px-3 py-2.5 text-[13.5px] font-semibold text-ink hover:border-accent focus-within:border-accent",
             busy && "opacity-40",
           )}
         >
-          <span className="flex size-8 items-center justify-center rounded-full bg-white text-accent shadow-[0_1px_2px_rgba(43,36,32,0.1)]">
+          <span className="flex size-[30px] items-center justify-center rounded-full bg-white text-accent shadow-[0_1px_2px_rgba(43,36,32,0.1)]">
             <Icon name="upload" />
           </span>
           {t("upload")}
           <input type="file" onChange={upload} disabled={busy} className="sr-only" />
         </label>
       )}
-      <p className={field.hint}>{t("limit")}</p>
-      {error && <p role="alert" className={field.error}>{error}</p>}
+      <p className={cx(field.hint, "mt-2")}>{t("limit")}</p>
+      {error && <p role="alert" className={cx(field.error, "mt-2")}>{error}</p>}
     </section>
   );
 }
+
+// The tag on a file: its extension in lower case, cut to what fits the tile, empty for a name without one.
+const extension = (name: string) => (name.includes(".") ? name.split(".").pop()!.toLowerCase().slice(0, 4) : "");

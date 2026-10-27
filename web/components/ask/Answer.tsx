@@ -7,7 +7,7 @@ import Icon from "@/components/Icon";
 import { api } from "@/lib/api";
 import { answerMarkdown, itemHref, type AskClaim, type AskFeedback, type AskItem, type AskStatus } from "@/lib/ask";
 import { day, dayOf, itemDay } from "@/lib/format";
-import { button, chip, cx, field, sectionTitle } from "@/lib/ui";
+import { button, chip, cx, field, raised, sectionTitle } from "@/lib/ui";
 
 export type Chip = {
   kind: "project" | "node" | "client" | "user" | "contact" | "date";
@@ -37,7 +37,9 @@ export type Turn = {
 // One question and its answer, laid out as §10.3 lists: status line, claims
 // with citation chips, sources, what was retrieved but not cited, the scope
 // used and the model badge. It serves the live stream and the saved thread.
-export default function Answer({ turn, onRemoveChip }: { turn: Turn; onRemoveChip?: (c: Chip) => void }) {
+// On the page the answer is a raised card; `flat` leaves it on the surface it
+// sits on, for the Ask panel, which floats already.
+export default function Answer({ turn, onRemoveChip, flat = false }: { turn: Turn; onRemoveChip?: (c: Chip) => void; flat?: boolean }) {
   const t = useTranslations("ask");
   const te = useTranslations("errors");
   const byKey = new Map(turn.evidence.map((it) => [it.key, it]));
@@ -68,14 +70,28 @@ export default function Answer({ turn, onRemoveChip }: { turn: Turn; onRemoveChi
     );
   }
 
+  const meta = !turn.streaming && ((turn.scope && turn.scope.length > 0) || turn.model || turn.claims.length > 0) && (
+    <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+      {turn.scope && turn.scope.length > 0 && <span className={sectionTitle}>{t("scopeUsed")}</span>}
+      {turn.scope?.map((c) => (
+        <ChipView key={`${c.kind}:${c.id ?? c.from}`} chip={c} onRemove={c.detected ? onRemoveChip : undefined} />
+      ))}
+      {turn.model && <span className={cx(chip, "ml-auto rounded-full bg-well text-ink-soft")}>{turn.model}</span>}
+      {turn.claims.length > 0 && <CopyButton question={turn.question} claims={turn.claims} />}
+    </div>
+  );
+  const feedback = !turn.streaming && turn.queryId && (turn.status === "answered" || turn.status === "not_enough_info") && (
+    <Feedback queryId={turn.queryId} initial={turn.feedback} />
+  );
+
   return (
-    <article aria-label={turn.question} className="flex flex-col gap-4 pb-2">
+    <article aria-label={turn.question} className={cx("flex flex-col gap-4", flat && "pb-2")}>
       <h3 className="max-w-[85%] self-end rounded-[18px_18px_6px_18px] bg-accent-soft px-4 py-3 text-[15px] font-semibold leading-snug text-ink">{turn.question}</h3>
-      <div className="flex gap-3">
+      <div className={cx("flex gap-3", !flat && cx(raised, "px-5 py-4.5"))}>
       <span aria-hidden="true" className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-accent text-white">
         <Icon name="logo" className="size-[18px]" />
       </span>
-      <div className="flex min-w-0 flex-1 flex-col gap-3 pt-1">
+      <div className={cx("flex min-w-0 flex-1 flex-col gap-3", flat && "pt-1")}>
       {status}
       {turn.claims.length > 0 && (
         <ul className="flex flex-col gap-2.5 text-[15px] leading-relaxed">
@@ -92,29 +108,30 @@ export default function Answer({ turn, onRemoveChip }: { turn: Turn; onRemoveChi
       {turn.status === "not_enough_info" && !turn.streaming && (
         <div className="flex flex-col gap-2">
           <p className="text-[13px] text-muted">{t("suggestions")}</p>
-          {turn.closest.length > 0 && <ItemList title={t("closest")} items={turn.closest} />}
+          {turn.closest.length > 0 && <ItemList title={t("closest")} items={turn.closest} flat={flat} />}
         </div>
       )}
-      {turn.status === "ai_off" && !turn.streaming && (turn.results.length > 0 ? <ItemList title={t("results")} items={turn.results} /> : <p className="text-[13px] text-muted">{t("noResults")}</p>)}
-      {cited.length > 0 && <ItemList title={t("sources")} items={cited} />}
+      {turn.status === "ai_off" && !turn.streaming && (turn.results.length > 0 ? <ItemList title={t("results")} items={turn.results} flat={flat} /> : <p className="text-[13px] text-muted">{t("noResults")}</p>)}
+      {cited.length > 0 && <ItemList title={t("sources")} items={cited} flat={flat} />}
       {uncited.length > 0 && !turn.streaming && turn.status === "answered" && (
         <details className="text-[13px]">
           <summary className="cursor-pointer text-muted">{t("alsoRetrieved", { count: uncited.length })}</summary>
-          <ItemList items={uncited} />
+          <ItemList items={uncited} flat={flat} />
         </details>
       )}
-      {!turn.streaming && (
-        <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
-          {turn.scope && turn.scope.length > 0 && <span className={sectionTitle}>{t("scopeUsed")}</span>}
-          {turn.scope?.map((c) => (
-            <ChipView key={`${c.kind}:${c.id ?? c.from}`} chip={c} onRemove={c.detected ? onRemoveChip : undefined} />
-          ))}
-          {turn.model && <span className={cx(chip, "ml-auto rounded-full bg-well text-ink-soft")}>{turn.model}</span>}
-          {turn.claims.length > 0 && <CopyButton question={turn.question} claims={turn.claims} />}
-        </div>
-      )}
-      {!turn.streaming && turn.queryId && (turn.status === "answered" || turn.status === "not_enough_info") && (
-        <Feedback queryId={turn.queryId} initial={turn.feedback} />
+      {/* In the card, the scope, model, copy and feedback sit under a thin line. */}
+      {flat ? (
+        <>
+          {meta}
+          {feedback}
+        </>
+      ) : (
+        (meta || feedback) && (
+          <div className="flex flex-col gap-3 border-t border-line-soft pt-3">
+            {meta}
+            {feedback}
+          </div>
+        )
       )}
       </div>
       </div>
@@ -164,16 +181,17 @@ function Cite({ itemKey, item }: { itemKey: string; item?: AskItem }) {
   );
 }
 
-function ItemList({ title, items }: { title?: string; items: AskItem[] }) {
+// Rows split by lines: between two lines on the card, or in a box of their own when flat.
+function ItemList({ title, items, flat }: { title?: string; items: AskItem[]; flat: boolean }) {
   const t = useTranslations("ask");
   const locale = useLocale();
   const timeZone = useTimeZone();
   return (
     <div className="flex flex-col gap-1.5">
       {title && <h4 className={sectionTitle}>{title}</h4>}
-      <ul className="flex flex-col divide-y divide-line-soft overflow-hidden rounded-xl border border-line bg-white text-[13px]">
+      <ul className={cx("flex flex-col divide-y divide-line-soft text-[13px]", flat ? "overflow-hidden rounded-xl border border-line bg-white" : "border-y border-line-soft")}>
         {items.map((it) => (
-          <li key={it.key} className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 px-3.5 py-2.5">
+          <li key={it.key} className={cx("flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 py-2.5", flat && "px-3.5")}>
             <Link href={itemHref(it.key)} className="text-xs font-bold">{it.key}</Link>
             {/* MSL-23: a real basis, so the details wrap below instead of squeezing the title to a word per line. */}
             <span className="min-w-0 flex-[1_1_16rem] font-semibold">{it.title}</span>

@@ -8,7 +8,7 @@ import PageBar from "@/components/PageBar";
 import { asTables } from "@/lib/convert";
 import { dateTime, dayOf } from "@/lib/format";
 import { getProject, serverApi } from "@/lib/server-api";
-import { button, chip, cx, panel, sectionTitle } from "@/lib/ui";
+import { button, chip, cx, raised, section, sectionHeading } from "@/lib/ui";
 import DraftButton from "./DraftButton";
 import Replace from "./Replace";
 
@@ -35,7 +35,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ docKe
   return (
     <>
       <PageBar>
-        <div className="flex min-w-0 flex-1 basis-full flex-col gap-1 md:basis-0">
+        <div className="flex min-w-0 flex-1 basis-full flex-col gap-1 md:min-w-64 md:basis-0">
           <nav aria-label={tt("path")} className="flex items-center gap-1.5 text-[13px] text-muted">
             <Link href={`/p/${doc.project_key}/board`}>{doc.project_key}</Link>
             <Icon name="chevronRight" className="size-3.5" />
@@ -49,7 +49,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ docKe
         </a>
         {admin && <DraftButton docKey={doc.key} />}
       </PageBar>
-      <main className="grid items-start gap-5 px-4 py-4 md:px-5 lg:grid-cols-[minmax(0,1fr)_280px]">
+      <main className="grid items-start gap-8 px-4 py-4 md:px-5 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-10">
         <div className="flex min-w-0 flex-col gap-4">
           {doc.superseded_by && (
             <p className="flex items-center gap-2 rounded-xl border border-warn-line bg-warn-soft px-3.5 py-2.5 text-[13px] font-semibold text-warn">
@@ -57,7 +57,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ docKe
               <Link href={`/documents/${doc.superseded_by}`} className="text-warn underline hover:text-warn">{t("supersededBy", { key: doc.superseded_by })}</Link>
             </p>
           )}
-          <article className={cx(panel, "flex flex-col gap-7 px-5 py-6 md:px-8 md:py-7")}>
+          <article className={cx(raised, "flex flex-col gap-7 px-5 py-6 md:px-8.5 md:py-7")}>
             <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
               <span className="font-bold">{doc.key}</span>
               {showsClients(clients.data?.items ?? []) && <ClientChip client={doc.client} coreLabel={t("allClients")} />}
@@ -105,7 +105,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ docKe
             ))}
           </article>
         </div>
-        <aside className="flex flex-col gap-4 lg:sticky lg:top-4">
+        <aside className="flex min-w-0 flex-col lg:sticky lg:top-4">
           {admin && (
             <Replace
               docKey={doc.key}
@@ -114,10 +114,10 @@ export default async function DocumentPage({ params }: { params: Promise<{ docKe
             />
           )}
           {admin && doc.drafts.length > 0 && (
-            <section aria-labelledby="drafts-title" className={cx(panel, "flex flex-col gap-0.5 p-2")}>
-              <h2 id="drafts-title" className={cx(sectionTitle, "px-2.5 pb-1 pt-1.5")}>{t("drafts")}</h2>
+            <section aria-labelledby="drafts-title" className={cx(section, "flex flex-col gap-0.5")}>
+              <h2 id="drafts-title" className={sectionHeading}>{t("drafts")}</h2>
               {doc.drafts.map((d) => (
-                <Link key={d.id} href={`/tree-drafts/${d.id}`} className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] font-semibold text-ink no-underline hover:bg-paper hover:text-ink">
+                <Link key={d.id} href={`/tree-drafts/${d.id}`} className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] font-semibold text-ink no-underline hover:bg-well hover:text-ink">
                   <Icon name="tree" className="size-4 text-muted" />
                   <span title={dateTime(d.created_at, locale, timeZone)}>{dayOf(d.created_at, locale, timeZone)}</span>
                   <span className="ml-auto">
@@ -127,8 +127,8 @@ export default async function DocumentPage({ params }: { params: Promise<{ docKe
               ))}
             </section>
           )}
-          <nav aria-labelledby="outline-title" className={cx(panel, "flex max-h-[calc(100vh-2rem)] flex-col gap-0.5 overflow-y-auto p-2")}>
-            <h2 id="outline-title" className={cx(sectionTitle, "px-2.5 pb-1 pt-1.5")}>{t("outline")}</h2>
+          <nav aria-labelledby="outline-title" className={cx(section, "flex max-h-[calc(100vh-2rem)] flex-col gap-0.5 overflow-y-auto")}>
+            <h2 id="outline-title" className={sectionHeading}>{t("outline")}</h2>
             {doc.sections.map((s) => (
               <a
                 key={s.number}

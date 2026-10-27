@@ -6,7 +6,7 @@ import Icon from "@/components/Icon";
 import PageBar from "@/components/PageBar";
 import { dateTime, dayOf } from "@/lib/format";
 import { getProject, serverApi } from "@/lib/server-api";
-import { chip, cx, panel } from "@/lib/ui";
+import { chip, cx, raised } from "@/lib/ui";
 import DraftButton from "@/app/documents/[docKey]/DraftButton";
 import Upload from "./Upload";
 
@@ -44,23 +44,23 @@ export default async function DocumentsPage({ params }: { params: Promise<{ key:
       </PageBar>
       <main className="flex flex-col gap-4 px-4 py-4 md:px-5">
         <p className="max-w-3xl text-[13.5px] text-ink-soft">{t("intro")}</p>
-        <div className={cx("grid items-start gap-5", admin && "lg:grid-cols-[minmax(0,1fr)_340px]")}>
+        <div className={cx("grid grid-cols-[minmax(0,1fr)] items-start gap-5", admin && "lg:grid-cols-[minmax(0,1fr)_340px]")}>
           {items.length === 0 ? (
-            <div className={cx(panel, "flex flex-col items-center gap-2.5 px-6 py-12 text-center")}>
+            <div className="flex flex-col items-center gap-2.5 px-6 py-12 text-center">
               <span className="flex size-11 items-center justify-center rounded-full bg-well text-muted">
                 <Icon name="file" className="size-5" />
               </span>
               <p className="text-[13.5px] text-ink-soft">{t("none")}</p>
             </div>
           ) : (
-            <ul aria-label={t("heading")} className={cx(panel, "flex flex-col gap-0.5 p-1.5")}>
+            <ul aria-label={t("heading")} className={cx(raised, "flex min-w-0 flex-col gap-0.5 p-1.5")}>
               {items.map((d) => (
-                <li key={d.key} className="flex items-center gap-2 pr-2">
-                  <Link href={`/documents/${d.key}`} className="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-3 py-2.5 text-ink no-underline hover:bg-paper hover:text-ink">
+                <li key={d.key} className="flex flex-wrap items-center gap-x-2 sm:flex-nowrap sm:pr-2">
+                  <Link href={`/documents/${d.key}`} className="flex min-w-0 basis-full items-center gap-3 rounded-xl px-3 py-2.5 text-ink no-underline transition-colors hover:bg-paper hover:text-ink sm:basis-0 sm:flex-1">
                     <FileTile filename={d.filename} />
                     <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className={cx("text-sm font-semibold", d.superseded_by && "text-muted")}>{d.title}</span>
-                      <span className="text-xs text-muted">
+                      <span title={d.title} className={cx("truncate text-sm font-semibold", d.superseded_by && "text-muted")}>{d.title}</span>
+                      <span className="truncate text-xs text-muted">
                         <span className="font-bold">{d.key}</span> · <span title={dateTime(d.created_at, locale, timeZone)}>{dayOf(d.created_at, locale, timeZone)}</span> · {d.uploaded_by}
                       </span>
                     </span>
@@ -68,7 +68,11 @@ export default async function DocumentsPage({ params }: { params: Promise<{ key:
                     {withClients && <ClientChip client={d.client} coreLabel={t("allClients")} />}
                   </Link>
                   {/* MSL-48: draft the tree from the list, not two pages away. */}
-                  {admin && !d.superseded_by && <DraftButton docKey={d.key} quiet />}
+                  {admin && !d.superseded_by && (
+                    <span className="px-3 pb-2.5 sm:p-0">
+                      <DraftButton docKey={d.key} quiet />
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

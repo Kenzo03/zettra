@@ -56,7 +56,7 @@ export default function NodeForm({ projectKey, node, parentId, parentPath, clien
   return (
     <form aria-label={title} onSubmit={onSubmit} className="flex flex-col gap-4">
       <div className="flex flex-col gap-0.5">
-        <h2 className="text-[17px] font-extrabold tracking-[-0.01em]">{title}</h2>
+        <h2 className="text-base font-extrabold tracking-[-0.01em]">{title}</h2>
         {parentPath && <p className="text-[13px] text-muted">{t("under", { path: parentPath })}</p>}
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -131,7 +131,7 @@ export function ReadOnlyNode({ node }: { node: Node }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-2">
-        <h2 className="text-[17px] font-extrabold tracking-[-0.01em]">{node.name}</h2>
+        <h2 className="text-base font-extrabold tracking-[-0.01em]">{node.name}</h2>
         <span className={cx(chip, "bg-well text-ink-soft")}>{t(node.type)}</span>
         {node.type === "menu" &&
           (node.client_specific ? (

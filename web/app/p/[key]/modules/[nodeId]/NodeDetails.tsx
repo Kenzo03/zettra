@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { api } from "@/lib/api";
 import { nodePaths } from "@/lib/nodes";
 import { useProblemText, type Client, type Node } from "@/lib/problem";
-import { button, cx, field, panel, sectionTitle } from "@/lib/ui";
+import { button, cx, field, section, sectionHeading } from "@/lib/ui";
 import NodeForm, { ReadOnlyNode } from "../NodeForm";
 
 // The Details tab (FSD §7.4): project admins edit the node here; everyone else
@@ -21,14 +21,14 @@ export default function NodeDetails({ projectKey, node, clients, canEdit, nodes 
 }) {
   const router = useRouter();
   return (
-    <div className="flex max-w-3xl flex-col gap-4">
-      <div className={cx(panel, "p-5")}>
+    <div className="flex max-w-3xl flex-col">
+      <section className={section}>
         {canEdit && !node.archived ? (
           <NodeForm projectKey={projectKey} node={node} clients={clients} onSaved={() => router.refresh()} />
         ) : (
           <ReadOnlyNode node={node} />
         )}
-      </div>
+      </section>
       {canEdit && !node.archived && <Merge projectKey={projectKey} node={node} nodes={nodes} />}
     </div>
   );
@@ -62,10 +62,10 @@ function Merge({ projectKey, node, nodes }: { projectKey: string; node: Node; no
   }
 
   return (
-    <form onSubmit={merge} aria-label={t("title")} className={cx(panel, "flex flex-col gap-2 p-5")}>
-      <h2 className={sectionTitle}>{t("title")}</h2>
+    <form onSubmit={merge} aria-label={t("title")} className={section}>
+      <h2 className={sectionHeading}>{t("title")}</h2>
       <p className="text-[13px] text-muted">{t("hint")}</p>
-      <div className="flex flex-wrap items-end gap-2">
+      <div className="mt-2 flex flex-wrap items-end gap-2">
         <label className={field.label}>
           {t("into")}
           <select name="into_id" required defaultValue="" className={cx(field.compact, "min-w-64")}>
@@ -77,7 +77,7 @@ function Merge({ projectKey, node, nodes }: { projectKey: string; node: Node; no
         </label>
         <button className={button.danger}>{t("merge")}</button>
       </div>
-      {error && <p role="alert" className={field.error}>{error}</p>}
+      {error && <p role="alert" className={cx(field.error, "mt-2")}>{error}</p>}
     </form>
   );
 }

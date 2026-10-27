@@ -7,7 +7,7 @@ import { api } from "@/lib/api";
 import type { components } from "@/lib/api-types";
 import { changesFields, updateBody, type BulkChange } from "@/lib/bulk";
 import { useProblemText, type Ref, type Status } from "@/lib/problem";
-import { button, cx, field, panel } from "@/lib/ui";
+import { button, field } from "@/lib/ui";
 
 type Priority = components["schemas"]["Priority"];
 
@@ -88,69 +88,72 @@ export default function BulkBar({ people, statuses, releases }: { people: Ref[];
   const open = statuses.filter((s) => s.category === "todo" || s.category === "in_progress");
   return (
     // Explicit label ids: some assistive tech misses wrapping labels (MSL-62).
-    <form id="bulk" aria-label={t("label")} onSubmit={apply} className={cx(panel, "flex flex-wrap items-end gap-3 p-3")}>
-      <p className="basis-full text-[13px] font-semibold text-ink-soft">{count > 0 ? t("selected", { count }) : t("hint")}</p>
-      <fieldset disabled={count === 0 || busy !== ""} className="contents">
-        <label htmlFor="bulk-assignee" className={field.label}>
-          {t("assignee")}
-          <select id="bulk-assignee" name="assignee" defaultValue="keep" className={field.compact}>
-            <option value="keep">{t("keep")}</option>
-            <option value="none">{t("nobody")}</option>
-            {people.map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
-          </select>
-        </label>
-        <label htmlFor="bulk-priority" className={field.label}>
-          {t("priority")}
-          <select id="bulk-priority" name="priority" defaultValue="" className={field.compact}>
-            <option value="">{t("keep")}</option>
-            {(["low", "medium", "high", "urgent"] as const).map((p) => (
-              <option key={p} value={p}>{t(`priorities.${p}`)}</option>
-            ))}
-          </select>
-        </label>
-        <label htmlFor="bulk-due" className={field.label}>
-          {t("due")}
-          <input id="bulk-due" type="date" name="due" className={field.compact} />
-        </label>
-        <label htmlFor="bulk-clear-due" className="flex items-center gap-1.5 pb-2 text-[13px]">
-          <input id="bulk-clear-due" type="checkbox" name="clear_due" className="size-4 accent-accent" />
-          {t("clearDue")}
-        </label>
-        <label htmlFor="bulk-status" className={field.label}>
-          {t("status")}
-          <select id="bulk-status" name="status" defaultValue="" className={field.compact}>
-            <option value="">{t("keep")}</option>
-            {open.map((s) => (
-              <option key={s.id} value={s.id}>{s.name}</option>
-            ))}
-          </select>
-        </label>
-        {releases.length > 0 && (
-          <label htmlFor="bulk-release" className={field.label}>
-            {t("release")}
-            <select id="bulk-release" name="release" defaultValue="keep" className={field.compact}>
+    // The page shows the "tick tickets" line above; the controls appear once one is ticked.
+    <form id="bulk" aria-label={t("label")} onSubmit={apply} className="flex flex-col gap-2 empty:hidden">
+      {count > 0 && (
+        <fieldset disabled={busy !== ""} className="flex flex-wrap items-end gap-3 rounded-xl bg-well p-3">
+          <p className="basis-full text-[13px] font-bold text-ink">{t("selected", { count })}</p>
+          <label htmlFor="bulk-assignee" className={field.label}>
+            {t("assignee")}
+            <select id="bulk-assignee" name="assignee" defaultValue="keep" className={field.compact}>
               <option value="keep">{t("keep")}</option>
-              <option value="none">{t("noRelease")}</option>
-              {releases.map((r) => (
-                <option key={r.id} value={r.id}>{r.name}</option>
+              <option value="none">{t("nobody")}</option>
+              {people.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </select>
           </label>
-        )}
-        <button className={button.secondary}>{busy || t("apply", { count })}</button>
-        {/* MSL-65: closing needs a decision record each, so the ticked tickets go to the close-out queue. */}
-        <button
-          type="button"
-          onClick={() => router.push(`/p/${projectKey}/closeout?keys=${[...rows()].filter((c) => c.checked).map((c) => c.value).join(",")}`)}
-          className={button.secondary}
-        >
-          {t("closeOut", { count })}
-        </button>
-      </fieldset>
+          <label htmlFor="bulk-priority" className={field.label}>
+            {t("priority")}
+            <select id="bulk-priority" name="priority" defaultValue="" className={field.compact}>
+              <option value="">{t("keep")}</option>
+              {(["low", "medium", "high", "urgent"] as const).map((p) => (
+                <option key={p} value={p}>{t(`priorities.${p}`)}</option>
+              ))}
+            </select>
+          </label>
+          <label htmlFor="bulk-due" className={field.label}>
+            {t("due")}
+            <input id="bulk-due" type="date" name="due" className={field.compact} />
+          </label>
+          <label htmlFor="bulk-clear-due" className="flex items-center gap-1.5 pb-2 text-[13px]">
+            <input id="bulk-clear-due" type="checkbox" name="clear_due" className="size-4 accent-accent" />
+            {t("clearDue")}
+          </label>
+          <label htmlFor="bulk-status" className={field.label}>
+            {t("status")}
+            <select id="bulk-status" name="status" defaultValue="" className={field.compact}>
+              <option value="">{t("keep")}</option>
+              {open.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+          </label>
+          {releases.length > 0 && (
+            <label htmlFor="bulk-release" className={field.label}>
+              {t("release")}
+              <select id="bulk-release" name="release" defaultValue="keep" className={field.compact}>
+                <option value="keep">{t("keep")}</option>
+                <option value="none">{t("noRelease")}</option>
+                {releases.map((r) => (
+                  <option key={r.id} value={r.id}>{r.name}</option>
+                ))}
+              </select>
+            </label>
+          )}
+          <button className={button.secondary}>{busy || t("apply", { count })}</button>
+          {/* MSL-65: closing needs a decision record each, so the ticked tickets go to the close-out queue. */}
+          <button
+            type="button"
+            onClick={() => router.push(`/p/${projectKey}/closeout?keys=${[...rows()].filter((c) => c.checked).map((c) => c.value).join(",")}`)}
+            className={button.secondary}
+          >
+            {t("closeOut", { count })}
+          </button>
+        </fieldset>
+      )}
       {failed.length > 0 && (
-        <div role="alert" className="basis-full text-xs text-danger">
+        <div role="alert" className="text-xs text-danger">
           {t("failed")} {failed.join("; ")}
         </div>
       )}

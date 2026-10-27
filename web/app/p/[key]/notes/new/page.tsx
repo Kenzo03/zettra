@@ -3,7 +3,6 @@ import { getTranslations } from "next-intl/server";
 import NoteForm from "@/components/NoteForm";
 import PageBar from "@/components/PageBar";
 import { getProject, serverApi } from "@/lib/server-api";
-import { panel } from "@/lib/ui";
 
 export default async function NewNotePage({ params }: { params: Promise<{ key: string }> }) {
   const { key } = await params;
@@ -18,10 +17,8 @@ export default async function NewNotePage({ params }: { params: Promise<{ key: s
       <PageBar>
         <h1 className="text-base font-semibold">{t("newTitle")}</h1>
       </PageBar>
-      <main className="px-4 py-4 md:px-5">
-        <div className={panel}>
-          <NoteForm projectKey={key} clients={clients.data?.items ?? []} nodes={nodes.data?.items ?? []} />
-        </div>
+      <main className="max-w-4xl px-4 py-4 md:px-5">
+        <NoteForm projectKey={key} clients={clients.data?.items ?? []} nodes={nodes.data?.items ?? []} />
       </main>
     </>
   );

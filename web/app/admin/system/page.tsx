@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import PageBar from "@/components/PageBar";
 import { fileSize } from "@/lib/format";
 import { getMe, serverApi } from "@/lib/server-api";
-import { cx, panel, sectionTitle } from "@/lib/ui";
+import { cx, section, sectionTitle } from "@/lib/ui";
 
 // Admin → System status (FSD §18.3): database size, the job queue, the model
 // server's health and the disk use of the two volumes, warning from 80%.
@@ -17,19 +17,19 @@ export default async function SystemPage() {
       <PageBar>
         <h1 className="text-base font-semibold">{t("title")}</h1>
       </PageBar>
-      <main className="flex max-w-4xl flex-col gap-4 p-4 md:p-5">
+      <main className="max-w-4xl p-4 md:p-5">
         {!data ? (
           <p className="text-muted">{t("adminsOnly")}</p>
         ) : (
           <>
             {data.warnings.length > 0 && (
-              <ul role="alert" className="flex flex-col gap-1 rounded border border-danger-line bg-danger-soft p-3 text-[13px] text-danger">
+              <ul role="alert" className="mb-4 flex flex-col gap-1 rounded border border-danger-line bg-danger-soft p-3 text-[13px] text-danger">
                 {data.warnings.map((w) => (
                   <li key={w}>{t(`warnings.${w}`)}</li>
                 ))}
               </ul>
             )}
-            <section className={cx(panel, "grid gap-4 p-4 sm:grid-cols-3")}>
+            <section className="grid gap-4 sm:grid-cols-3">
               <div>
                 <h2 className={sectionTitle}>{t("database")}</h2>
                 <p className="text-lg font-semibold">{fileSize(data.database_bytes)}</p>
@@ -56,8 +56,8 @@ export default async function SystemPage() {
                 <p className="text-[13px]">{data.email?.enabled ? t("emailOn", { host: data.email.host ?? "" }) : t("emailOff")}</p>
               </div>
             </section>
-            <section className={cx(panel, "flex flex-col gap-3 p-4")}>
-              <h2 className={sectionTitle}>{t("disks")}</h2>
+            <section className={cx(section, "flex flex-col gap-3")}>
+              <h2 className="text-base font-extrabold">{t("disks")}</h2>
               {data.disks.map((d) => {
                 const pct = d.total_bytes > 0 ? Math.round((d.used_bytes / d.total_bytes) * 100) : 0;
                 return (

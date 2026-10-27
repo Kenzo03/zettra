@@ -90,14 +90,14 @@ export default function AskView({ chips: preset = [], threadId: initialThread, q
   }
 
   return (
-    <div className={compact ? "flex h-full flex-col" : "flex max-w-3xl flex-col gap-4"}>
+    <div className={compact ? "flex h-full flex-col" : "flex max-w-3xl flex-col gap-6"}>
       {(compact || turns.length > 0) && (
-        <div ref={thread} className={cx("flex flex-col gap-4", compact && "min-h-0 flex-1 overflow-y-auto p-4")}>
+        <div ref={thread} className={cx("flex flex-col", compact ? "min-h-0 flex-1 gap-4 overflow-y-auto p-4" : "gap-6")}>
           {turns.map((turn, i) => (
             // In the panel the newest turn is at least as tall as the thread, so
             // its question can scroll to the top while the answer streams below.
             <div key={i} className={compact && i === turns.length - 1 ? "min-h-full scroll-mt-4" : undefined}>
-              <Answer turn={turn} onRemoveChip={i === turns.length - 1 && !busy ? (c) => removeDetected(i, c) : undefined} />
+              <Answer turn={turn} flat={compact} onRemoveChip={i === turns.length - 1 && !busy ? (c) => removeDetected(i, c) : undefined} />
             </div>
           ))}
         </div>
@@ -112,7 +112,7 @@ export default function AskView({ chips: preset = [], threadId: initialThread, q
           run(q);
         }}
         className={cx(
-          "flex flex-col gap-2.5 rounded-2xl border border-field bg-white p-3.5 shadow-[0_1px_2px_rgba(43,36,32,0.04),0_8px_24px_rgba(43,36,32,0.06)] focus-within:border-accent",
+          "flex flex-col gap-2.5 rounded-2xl border border-field bg-white p-3.5 focus-within:border-accent",
           compact && "m-4 mt-0 shrink-0",
         )}
       >

@@ -12,7 +12,7 @@ import { describeChange, shown, type Change } from "@/lib/activity";
 import { dateTime } from "@/lib/format";
 import { pasteImages } from "@/lib/paste";
 import { useProblemText, type ActivityItem } from "@/lib/problem";
-import { button, chip, cx, field, panel } from "@/lib/ui";
+import { button, chip, cx, field, section, sectionHeading } from "@/lib/ui";
 import type { Person } from "@/lib/mentions";
 
 type Filter = "all" | "comments" | "history";
@@ -105,10 +105,10 @@ export default function Activity({ ticketKey, items, meId, canComment, people }:
     : "edit";
 
   return (
-    <section aria-labelledby="activity-title" className={cx(panel, "flex flex-col gap-4 px-5 py-4")}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 id="activity-title" className="text-base font-extrabold">{t("title")}</h2>
-        <div className="flex gap-0.5 rounded-[11px] bg-well p-[3px] text-[13px]">
+    <section aria-labelledby="activity-title" className={section}>
+      <div className={cx(sectionHeading, "flex-wrap gap-y-2")}>
+        <h2 id="activity-title">{t("title")}</h2>
+        <div className="ml-auto flex gap-0.5 rounded-[11px] bg-well p-[3px] text-[13px]">
           {(["all", "comments", "history"] as const).map((f) => (
             <button
               key={f}
@@ -125,13 +125,13 @@ export default function Activity({ ticketKey, items, meId, canComment, people }:
           ))}
         </div>
       </div>
-      {error && <p role="alert" className={field.error}>{error}</p>}
-      <ol className="flex flex-col gap-3.5">
+      {error && <p role="alert" className={cx(field.error, "mb-3")}>{error}</p>}
+      <ol className="mb-4 flex flex-col gap-3.5">
         {visible.map((it, i) =>
           it.kind === "comment" ? (
             <li key={`c${it.comment_id}`} className="flex gap-2.5">
               <Avatar name={it.actor?.name ?? "?"} className="size-8 bg-accent-soft text-[11px] font-bold text-accent-strong" />
-              <div className="flex min-w-0 flex-1 flex-col gap-1.5 rounded-[4px_16px_16px_16px] border border-line bg-white px-4 py-3">
+              <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
                   <span className="text-[13.5px] font-bold text-ink">{it.actor?.name}</span>
                   {it.internal ? (
@@ -173,7 +173,7 @@ export default function Activity({ ticketKey, items, meId, canComment, people }:
                     <Icon name={eventIcon(it)} className="size-3.5" />
                   </span>
                 </span>
-                <span className="min-w-0 flex-1">{describeChange(t, it)}</span>
+                <span className="min-w-0 flex-1 break-words">{describeChange(t, it)}</span>
                 <span className="shrink-0 text-xs text-muted">{dateTime(it.at, locale, timeZone)}</span>
               </div>
               {details(it)}
@@ -182,7 +182,7 @@ export default function Activity({ ticketKey, items, meId, canComment, people }:
         )}
       </ol>
       {canComment && (
-        <form onSubmit={send} className="flex flex-col gap-2.5 border-t border-line-soft pt-4">
+        <form onSubmit={send} className="flex flex-col gap-2.5">
           <MentionBox ticketKey={ticketKey} name="body" required maxLength={20000} rows={3} aria-label={t("placeholder")} placeholder={t("placeholder")} onPaste={paste} />
           <p className={field.hint}>{t("markdownHint")} {t("mentionHint")}</p>
           <div className="flex flex-wrap items-center gap-3">

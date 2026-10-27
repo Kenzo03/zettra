@@ -6,7 +6,7 @@ import PageBar from "@/components/PageBar";
 import type { components, operations } from "@/lib/api-types";
 import { dateIn, day } from "@/lib/format";
 import { getProject, serverApi } from "@/lib/server-api";
-import { cx, field, table } from "@/lib/ui";
+import { cx, field, section } from "@/lib/ui";
 import StatusTools from "./StatusTools";
 
 type Query = NonNullable<operations["listTickets"]["parameters"]["query"]>;
@@ -86,31 +86,31 @@ export default async function StatusPage({ params, searchParams }: {
           </form>
         )}
         <h2 className="hidden text-lg font-bold print:block">{heading}</h2>
-        {groups.map(([name], i) => (
-          <section key={name} aria-labelledby={`status-${name}`} className="flex flex-col gap-2 break-inside-avoid">
-            <h2 id={`status-${name}`} className="text-[15px] font-bold">
-              {t(name)} <span className="text-muted">{found[i].items.length}</span>
-            </h2>
-            {found[i].items.length === 0 ? (
-              <p className="text-[13px] text-muted">{t("none")}</p>
-            ) : (
-              <div className={table.wrap}>
-                <table className={table.table}>
-                  <tbody>
-                    {found[i].items.map((it) => (
-                      <tr key={it.id} className={table.row}>
-                        <td className={cx(table.td, "w-24 whitespace-nowrap font-mono font-semibold")}><Link href={`/t/${it.key}`}>{it.key}</Link></td>
-                        <td className={table.td}>{it.title}</td>
-                        <td className={cx(table.td, "text-muted")}>{line(it)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-            {found[i].more && <p className="text-xs text-muted">{t("more")}</p>}
-          </section>
-        ))}
+        {/* Nothing is raised: each group is a section, its tickets rows split by lines. */}
+        <div>
+          {groups.map(([name], i) => (
+            <section key={name} aria-labelledby={`status-${name}`} className={cx(section, "flex flex-col gap-2 break-inside-avoid")}>
+              <h2 id={`status-${name}`} className="text-[15px] font-bold">
+                {t(name)} <span className="text-muted">{found[i].items.length}</span>
+              </h2>
+              {found[i].items.length === 0 ? (
+                <p className="text-[13px] text-muted">{t("none")}</p>
+              ) : (
+                <ul>
+                  {found[i].items.map((it) => (
+                    // A phone stacks the detail under the title; a printed title wraps rather than being cut.
+                    <li key={it.id} className="grid grid-cols-[96px_minmax(0,1fr)] items-baseline gap-x-3.5 gap-y-0.5 border-b border-line-soft py-2.5 text-[13px] last:border-b-0 sm:grid-cols-[96px_minmax(0,1fr)_auto]">
+                      <Link href={`/t/${it.key}`} title={it.key} className="truncate font-mono font-semibold">{it.key}</Link>
+                      <span title={it.title} className="truncate print:overflow-visible print:whitespace-normal print:[overflow-wrap:anywhere]">{it.title}</span>
+                      <span className="col-start-2 text-muted sm:col-start-auto sm:max-w-sm sm:text-right">{line(it)}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {found[i].more && <p className="text-xs text-muted">{t("more")}</p>}
+            </section>
+          ))}
+        </div>
       </main>
     </>
   );

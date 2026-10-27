@@ -7,7 +7,7 @@ import CloseDialog from "@/components/CloseDialog";
 import { api } from "@/lib/api";
 import type { components } from "@/lib/api-types";
 import { problemKey, type Node, type Status, type Ticket } from "@/lib/problem";
-import { button, cx, field, panel } from "@/lib/ui";
+import { button, cx, field } from "@/lib/ui";
 
 type Draft = components["schemas"]["DecisionDraft"];
 type Row = { key: string; ticket?: Ticket; draft?: Draft; state: "loading" | "missing" | "closed" | "waiting" | "drafting" | "drafted" | "off" | "failed" };
@@ -75,11 +75,11 @@ export default function CloseOut({ keys, statuses, nodes }: { keys: string[]; st
         )}
         <p role="status" className="text-[13px] text-muted">{t("progress", { closed: rows.filter((r) => r.state === "closed").length, total: rows.length })}</p>
       </div>
-      <ul className={cx(panel, "flex flex-col divide-y divide-line-soft")}>
+      <ul className="flex flex-col divide-y divide-line-soft border-y border-line-soft">
         {rows.map((r) => (
-          <li key={r.key} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3 text-[13px]">
+          <li key={r.key} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-3 text-[13px]">
             <Link href={`/t/${r.key}`} className="font-mono font-semibold">{r.key}</Link>
-            <span className="min-w-0 flex-1">{r.ticket?.title}</span>
+            <span title={r.ticket?.title} className="min-w-40 flex-1 truncate">{r.ticket?.title}</span>
             <span className={cx("text-xs", r.state === "failed" ? "text-danger" : "text-muted")}>{t(`state.${r.state}`)}</span>
             {r.ticket && r.state !== "closed" && (
               <button type="button" onClick={() => review(r.key)} className={button.quiet}>{t("review")}</button>

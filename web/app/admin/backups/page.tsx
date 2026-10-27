@@ -3,7 +3,7 @@ import { getLocale, getTimeZone, getTranslations } from "next-intl/server";
 import PageBar from "@/components/PageBar";
 import { dateTime, fileSize } from "@/lib/format";
 import { getMe, serverApi } from "@/lib/server-api";
-import { cx, panel, sectionTitle, table } from "@/lib/ui";
+import { cx, section, sectionHeading, sectionTitle, table } from "@/lib/ui";
 import RunBackup from "./RunBackup";
 
 // Admin → Backups (FSD §15.6): the last backup's time, size and location,
@@ -32,7 +32,7 @@ export default async function BackupsPage() {
                 {t("sameDisk")}
               </p>
             )}
-            <section className={cx(panel, "grid gap-4 p-4 sm:grid-cols-3")}>
+            <section className="grid gap-4 sm:grid-cols-3">
               <div>
                 <h2 className={sectionTitle}>{t("last")}</h2>
                 <p className="text-[13px] font-semibold">{last ? dateTime(last.created_at, locale, timeZone) : t("none")}</p>
@@ -43,7 +43,7 @@ export default async function BackupsPage() {
               </div>
               <div>
                 <h2 className={sectionTitle}>{t("location")}</h2>
-                <p className="font-mono text-xs">{data.location}</p>
+                <p className="break-all font-mono text-xs">{data.location}</p>
               </div>
             </section>
             {data.items.length > 0 && (
@@ -68,17 +68,19 @@ export default async function BackupsPage() {
                 </table>
               </div>
             )}
-            <section className={cx(panel, "flex flex-col gap-2 p-4 text-[13px] leading-relaxed")}>
-              <h2 className={sectionTitle}>{t("restoreTitle")}</h2>
-              <p>{t("schedule")}</p>
-              <ol className="ml-5 list-decimal">
-                <li>{t("restore1")}</li>
-                <li>
-                  {t("restore2")} <code className="font-mono text-xs">./restore.sh {last?.file ?? "db-YYYYMMDD-HHMM.dump"}</code>
-                </li>
-                <li>{t("restore3")}</li>
-              </ol>
-              <p className="text-muted">{t("offsite")}</p>
+            <section className={section}>
+              <h2 className={sectionHeading}>{t("restoreTitle")}</h2>
+              <div className="flex flex-col gap-2 text-[13px] leading-relaxed">
+                <p>{t("schedule")}</p>
+                <ol className="ml-5 list-decimal">
+                  <li>{t("restore1")}</li>
+                  <li>
+                    {t("restore2")} <code className="font-mono text-xs">./restore.sh {last?.file ?? "db-YYYYMMDD-HHMM.dump"}</code>
+                  </li>
+                  <li>{t("restore3")}</li>
+                </ol>
+                <p className="text-muted">{t("offsite")}</p>
+              </div>
             </section>
           </>
         )}

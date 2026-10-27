@@ -24,7 +24,7 @@ import { ClientChip } from "@/components/Chips";
 import Icon from "@/components/Icon";
 import { api } from "@/lib/api";
 import { useProblemText, type Client, type Node, type Problem } from "@/lib/problem";
-import { button, chip, cx, field, panel } from "@/lib/ui";
+import { button, chip, cx, field, raised } from "@/lib/ui";
 import NodeForm, { ReadOnlyNode } from "./NodeForm";
 
 type Children = Map<number | null, Node[]>;
@@ -276,6 +276,7 @@ export default function ModuleTree({ projectKey, nodes, clients, canEdit, showAr
                 <button
                   type="button"
                   onClick={() => select(n.id)}
+                  title={n.name}
                   aria-current={current ? "true" : undefined}
                   className={cx(
                     "min-w-0 flex-1 cursor-pointer self-stretch truncate text-left",
@@ -408,8 +409,8 @@ export default function ModuleTree({ projectKey, nodes, clients, canEdit, showAr
   }
 
   return (
-    <div className="grid items-start gap-4 md:grid-cols-[minmax(0,560px)_minmax(0,1fr)]">
-      <section aria-label={t("tree")} className={panel}>
+    <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-10 lg:grid-cols-[minmax(0,560px)_minmax(20rem,1fr)]">
+      <section aria-label={t("tree")} className={raised}>
         <div className="flex flex-wrap items-center gap-2 border-b border-line-soft p-3">
           <label className="flex h-9 min-w-40 flex-1 items-center gap-2 rounded-[10px] border border-line bg-paper px-3 text-muted focus-within:bg-white focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent">
             <Icon name="search" />
@@ -474,7 +475,7 @@ export default function ModuleTree({ projectKey, nodes, clients, canEdit, showAr
           )}
         </div>
       </section>
-      <section aria-label={t("details")} className={cx(panel, "p-5")}>
+      <section aria-label={t("details")} className="min-w-0 pt-1">
         {error && <p role="alert" className={cx(field.error, "mb-3")}>{error}</p>}
         {creatingUnder !== undefined ? (
           <NodeForm

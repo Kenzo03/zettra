@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { api } from "@/lib/api";
 import type { User } from "@/lib/problem";
-import { button, field } from "@/lib/ui";
+import { button, cx, field, section } from "@/lib/ui";
 
 const events = ["assigned", "comment", "mention", "status", "due", "job_done"] as const;
 
@@ -33,8 +33,8 @@ export default function NotifyPrefsForm({ me }: { me: User }) {
   }
 
   return (
-    <form onSubmit={save} aria-label={t("title")} className="flex flex-col gap-2.5">
-      <h2 className="text-sm font-semibold">{t("title")}</h2>
+    <form onSubmit={save} aria-label={t("title")} className={cx(section, "flex flex-col gap-2.5")}>
+      <h2 className="text-base font-extrabold">{t("title")}</h2>
       {events.map((ev) => (
         <label key={ev} className="flex items-center gap-2 text-[13px]">
           <input type="checkbox" name={ev} defaultChecked={prefs[ev] !== false} className="size-4 accent-accent" />

@@ -6,7 +6,7 @@ import { Avatar } from "@/components/Chips";
 import { api } from "@/lib/api";
 import type { components } from "@/lib/api-types";
 import { useProblemText, type Client, type Member, type ProjectRole } from "@/lib/problem";
-import { button, cx, field, panel, table } from "@/lib/ui";
+import { button, cx, field, section, table } from "@/lib/ui";
 
 type Row = { email: string; name: string; role: ProjectRole; all_clients: boolean; client_ids: number[] };
 
@@ -102,12 +102,12 @@ export default function ProjectMembers({
   }
 
   return (
-    <section aria-labelledby="members-title" className={cx(panel, "flex flex-col gap-3 p-4")}>
-      <h2 id="members-title" className="text-sm font-semibold">{t("membersTitle")}</h2>
+    <section aria-labelledby="members-title" className={cx(section, "flex flex-col gap-3")}>
+      <h2 id="members-title" className="text-base font-extrabold">{t("membersTitle")}</h2>
       {rows.length === 0 ? (
         <p className="text-[13px] text-muted">{t("noMembers")}</p>
       ) : (
-        <div className="overflow-x-auto rounded border border-line-soft">
+        <div className={table.plain}>
           <table className={table.table}>
             <thead className={table.head}>
               <tr>

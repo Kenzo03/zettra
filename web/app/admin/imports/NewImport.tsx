@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { button, cx, field, panel } from "@/lib/ui";
+import { button, cx, field } from "@/lib/ui";
 
 // Upload a file into a new import; the server dry-runs it at once.
 // defaultKey preselects the project a project's own "Import tickets" came from.
@@ -24,7 +24,7 @@ export default function NewImport({ projects, defaultKey }: { projects: { key: s
   }
 
   return (
-    <form onSubmit={upload} aria-label={t("new")} className={cx(panel, "flex flex-wrap items-end gap-3 p-4")}>
+    <form onSubmit={upload} aria-label={t("new")} className="flex flex-wrap items-end gap-3">
       <label className={field.label}>
         {t("project")}
         <select name="project_key" required defaultValue={defaultKey} className={field.input}>

@@ -8,7 +8,7 @@ import type { components } from "@/lib/api-types";
 import { dateIn, day } from "@/lib/format";
 import { nodePaths } from "@/lib/nodes";
 import { useProblemText, type Client, type Node, type Problem } from "@/lib/problem";
-import { button, cx, field, panel, sectionTitle } from "@/lib/ui";
+import { button, cx, field, section } from "@/lib/ui";
 
 type Scope = components["schemas"]["SummaryScope"];
 type Preview = components["schemas"]["SummaryPreview"];
@@ -71,7 +71,7 @@ export default function Builder({ projectKey, clients, nodes, releases, locale }
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-4">
-      <form onSubmit={load} aria-label={t("scope")} className={cx(panel, "flex flex-wrap items-end gap-3 p-4")}>
+      <form onSubmit={load} aria-label={t("scope")} className="flex flex-wrap items-end gap-3">
         <label className={field.label}>
           {t("node")}
           <select value={scope.node_id} onChange={(e) => set({ node_id: Number(e.target.value) })} className={field.input}>
@@ -135,9 +135,9 @@ export default function Builder({ projectKey, clients, nodes, releases, locale }
       <p className="text-xs text-muted">{scope.audience === "client" ? t("clientNote") : t("internalNote")}</p>
       {problem && !problem.errors?.length && <p role="alert" className={field.error}>{problemText(problem)}</p>}
       {preview && (
-        <section aria-labelledby="items-title" className={cx(panel, "flex flex-col gap-3 p-4")}>
+        <section aria-labelledby="items-title" className={cx(section, "flex flex-col gap-3")}>
           <div className="flex flex-wrap items-center gap-2">
-            <h2 id="items-title" className={sectionTitle}>{t("items", { ticked: ticked.size, count: preview.items.length })}</h2>
+            <h2 id="items-title" className="text-base font-extrabold">{t("items", { ticked: ticked.size, count: preview.items.length })}</h2>
           </div>
           {preview.items.length === 0 && <p className="text-sm text-muted">{t("noItems")}</p>}
           {groups.map(([menu, items]) => (

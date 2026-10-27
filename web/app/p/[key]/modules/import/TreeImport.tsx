@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import type { components } from "@/lib/api-types";
-import { button, cx, field, panel, sectionTitle } from "@/lib/ui";
+import { button, cx, field, section, sectionTitle } from "@/lib/ui";
 
 type Result = components["schemas"]["NodeImportResult"];
 
@@ -38,7 +38,7 @@ export default function TreeImport({ projectKey }: { projectKey: string }) {
       <pre className="overflow-x-auto rounded border border-line bg-paper p-3 font-mono text-xs">{`path,type,code,client_scope,clients,aliases
 HR > Attendance,module,HR.ATT,shared,,
 HR > Attendance > Overtime Approval,menu,HR.ATT.OT,client_specific,Client A;Client C,Persetujuan Lembur`}</pre>
-      <div className={cx(panel, "flex flex-wrap items-end gap-3 p-4")}>
+      <div className="flex flex-wrap items-end gap-3">
         <label className={field.label}>
           {t("file")}
           <input type="file" accept=".csv,text/csv" onChange={(e) => { setFile(e.target.files?.[0] ?? null); setPlan(null); }} className="text-[13px]" />
@@ -47,7 +47,7 @@ HR > Attendance > Overtime Approval,menu,HR.ATT.OT,client_specific,Client A;Clie
       </div>
       {error && <p role="alert" className={field.error}>{error}</p>}
       {plan && (
-        <section aria-label={t("plan")} className={cx(panel, "flex flex-col gap-3 p-4 text-[13px]")}>
+        <section aria-label={t("plan")} className={cx(section, "flex flex-col gap-3 text-[13px]")}>
           {plan.applied ? (
             <p role="status" className="font-semibold text-ok">{t("applied", { created: plan.created.length, changed: plan.changed.length })}</p>
           ) : (
