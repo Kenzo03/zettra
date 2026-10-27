@@ -70,6 +70,8 @@ async function closeDone(page: Page, ticketKey: string, whatChanged: string) {
 // Detail and list pages, each with the most and fewest raised cards it may show.
 // A path's {name} parts come from the sweep's setup. /summaries/{id} is left out:
 // writing a summary needs a model, and AI is off on the e2e stack.
+// Pages that may show nothing on this stack (no summary can be written with AI off,
+// and no backup has run) give `min: 0`; the status page, the Board and Workload raise nothing.
 const routeSweep: { path: string; max: number; min?: number }[] = [
   { path: "/notes/{note}", max: 1 },
   { path: "/documents/{doc}", max: 1 },
@@ -77,6 +79,22 @@ const routeSweep: { path: string; max: number; min?: number }[] = [
   { path: "/admin/ask-log/{query}", max: 1 },
   { path: "/admin/imports/{import}", max: 1 },
   { path: "/tree-drafts/{draft}", max: 1 },
+  { path: "/p/{key}/tickets", max: 1 },
+  { path: "/p/{key}/notes", max: 1 },
+  { path: "/p/{key}/documents", max: 1 },
+  { path: "/p/{key}/summaries", max: 1, min: 0 },
+  { path: "/search?q={run}", max: 1 },
+  { path: "/projects", max: 1 },
+  { path: "/p/{key}/modules", max: 1 },
+  { path: "/admin/users", max: 1 },
+  { path: "/admin/clients", max: 1 },
+  { path: "/admin/audit", max: 1 },
+  { path: "/admin/ask-log", max: 1 },
+  { path: "/admin/imports", max: 1 },
+  { path: "/admin/backups", max: 1, min: 0 },
+  { path: "/p/{key}/status", max: 0 },
+  { path: "/p/{key}/board", max: 0 },
+  { path: "/p/{key}/workload", max: 0 },
 ];
 
 test("open ticket raises the Reason and keeps every control", async ({ page }) => {
@@ -252,17 +270,35 @@ test("sweep: every page raises at most one card", async ({ page }) => {
   const imported = await upload("/imports", { file: { name: "jira.csv", mimeType: "text/csv", buffer: Buffer.from(jira) }, project_key: key, preset: "jira" });
   const ids: Record<string, string> = {
     key, menu: String(menu.id), note: (await note(`Sweep note ${run}`)).key, doc: doc.key,
-    draft: String(draft.id), query: String(asked.query_id), import: String(imported.id),
+    draft: String(draft.id), query: String(asked.query_id), import: String(imported.id), run,
   };
 
   for (const { path, max, min = max } of routeSweep) {
     const url = path.replace(/\{(\w+)\}/g, (_, name: string) => ids[name]);
     await page.goto(url);
     await expect(page.locator("main"), url).toBeVisible();
-    const count = await page.locator(".surface-raised").count();
-    expect(count, `${url} raises ${count}`).toBeLessThanOrEqual(max);
-    expect(count, `${url} raises ${count}`).toBeGreaterThanOrEqual(min);
+    // A page may fill on the client, so the count is polled until it fits, not read once.
+    const count = () => page.locator(".surface-raised").count();
+    await expect.poll(count, { message: `${url} raises too few` }).toBeGreaterThanOrEqual(min);
+    await expect.poll(count, { message: `${url} raises too many` }).toBeLessThanOrEqual(max);
   }
+});
+
+test("status groups are rows on the page", async ({ page }) => {
+  const { ticket, call, key } = await start(page);
+  const done = (await call("GET", `/projects/${key}/statuses`)).items.find((s: { name: string }) => s.name === "Done");
+  const closed = await ticket("Overtime approval skips the supervisor", { reason });
+  await call("POST", `/tickets/${closed.key}/transition`, {
+    status_id: done.id, reason,
+    decision: { what_changed: "Overtime approval skips the supervisor.", why: "Approvals stalled during leave periods.", alternatives: "" },
+  });
+
+  await page.goto(`/p/${key}/status`);
+  const group = page.getByRole("region", { name: /^Selesai 7 hari terakhir/ });
+  await expect(group.getByRole("link", { name: closed.key })).toBeVisible();
+  // Rows on the page, with no table and no box around them.
+  await expect(page.locator("main table")).toHaveCount(0);
+  await expect(group.locator(".surface-raised")).toHaveCount(0);
 });
 
 test("module page raises the newest decision only", async ({ page }) => {

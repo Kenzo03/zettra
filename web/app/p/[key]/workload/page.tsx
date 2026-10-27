@@ -37,7 +37,7 @@ export default async function WorkloadPage({ params }: { params: Promise<{ key: 
       </PageBar>
       <main className="flex flex-col gap-3 px-4 py-4 md:px-5">
         <p className="max-w-3xl text-[13.5px] text-ink-soft">{t("intro", { days: staleDays })}</p>
-        <div className={table.wrap}>
+        <div className={table.plain}>
           <table className={table.table}>
             <thead className={table.head}>
               <tr>
@@ -55,7 +55,7 @@ export default async function WorkloadPage({ params }: { params: Promise<{ key: 
               {rows.map((r) => {
                 const who = r.assignee ? String(r.assignee.id) : "none";
                 return (
-                  <tr key={who} className={cx(table.row, "hover:bg-paper")}>
+                  <tr key={who} className={cx(table.row, "transition-colors hover:bg-paper")}>
                     <td className={cx(table.td, "py-3 pl-5")}>
                       {r.assignee ? (
                         <span className="flex items-center gap-2.5 font-semibold">

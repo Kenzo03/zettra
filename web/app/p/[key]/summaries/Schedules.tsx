@@ -8,7 +8,7 @@ import { api } from "@/lib/api";
 import type { components } from "@/lib/api-types";
 import { day } from "@/lib/format";
 import { useProblemText, type Client } from "@/lib/problem";
-import { button, chip, cx, field, panel } from "@/lib/ui";
+import { button, chip, cx, field } from "@/lib/ui";
 
 type Schedule = components["schemas"]["SummarySchedule"];
 
@@ -54,9 +54,9 @@ export default function Schedules({ projectKey, clients, schedules }: { projectK
   }
 
   return (
-    <section aria-labelledby="weekly-title" className={cx(panel, "flex flex-col gap-4 p-5")}>
+    <section aria-labelledby="weekly-title" className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <h2 id="weekly-title" className="flex items-center gap-2 text-[15px] font-extrabold">
+        <h2 id="weekly-title" className="flex items-center gap-2 text-sm font-extrabold">
           <Icon name="calendar" className="size-4 text-accent" />
           {t("weekly")}
         </h2>
@@ -65,9 +65,9 @@ export default function Schedules({ projectKey, clients, schedules }: { projectK
       {schedules.length === 0 ? (
         <p className="text-[13px] text-muted">{t("weeklyNone")}</p>
       ) : (
-        <ul className="flex flex-col gap-1.5">
+        <ul className="flex flex-col">
           {schedules.map((s) => (
-            <li key={s.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-xl bg-paper px-3.5 py-2.5 text-[13px]">
+            <li key={s.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-line-soft py-2.5 text-[13px] first:pt-0 last:border-b-0">
               <span className="font-bold">{t("every", { day: weekdayName(s.weekday, locale) })}</span>
               <span className={cx(chip, "bg-well text-ink-soft")}>{s.client?.name ?? t("allClients")}</span>
               <span className="text-ink-soft">

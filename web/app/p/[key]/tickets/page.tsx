@@ -103,7 +103,7 @@ export default async function TicketsPage({
                 {items.map((it) => {
                   const status = statusOf.get(it.status_id);
                   return (
-                    <tr key={it.id} className={cx(table.row, "hover:bg-paper")}>
+                    <tr key={it.id} className={cx(table.row, "transition-colors hover:bg-paper")}>
                       {canEdit && (
                         <td className={cx(table.td, "pl-4 pr-0")}>
                           <input type="checkbox" name="key" value={it.key} form="bulk" aria-label={t("bulk.select", { key: it.key })} className="size-4 accent-accent" />

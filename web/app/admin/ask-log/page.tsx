@@ -45,7 +45,7 @@ export default async function AskLogPage({ searchParams }: { searchParams: Promi
         ) : (
           <>
             <div className="flex flex-wrap items-center gap-2">
-              <nav aria-label={t("quick")} className="flex gap-1">
+              <nav aria-label={t("quick")} className="flex flex-wrap gap-1">
                 {quick.map(([label, q]) => {
                   const current = JSON.stringify(q) === JSON.stringify(filters);
                   return (

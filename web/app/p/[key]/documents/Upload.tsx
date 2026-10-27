@@ -8,7 +8,7 @@ import type { components } from "@/lib/api-types";
 import { documentExtensions, firstHeading, toMarkdown } from "@/lib/convert";
 import { fileSize } from "@/lib/format";
 import { useProblemText, type Client, type Problem } from "@/lib/problem";
-import { button, cx, field, panel } from "@/lib/ui";
+import { button, cx, field, section } from "@/lib/ui";
 
 type DocumentListItem = components["schemas"]["DocumentListItem"];
 
@@ -56,8 +56,8 @@ export default function Upload({ projectKey, clients, documents }: { projectKey:
   }
 
   return (
-    <form onSubmit={submit} aria-label={t("upload")} className={cx(panel, "flex flex-col gap-4 p-5")}>
-      <h2 className="text-[15px] font-extrabold">{t("uploadTitle")}</h2>
+    <form onSubmit={submit} aria-label={t("upload")} className={cx(section, "flex flex-col gap-4 lg:mt-0 lg:border-t-0 lg:pt-0")}>
+      <h2 className="text-sm font-extrabold">{t("uploadTitle")}</h2>
       {/* The file input spans the zone, invisible, so a click opens the picker and a dropped file lands in it. */}
       <label className="relative flex flex-col items-center gap-1.5 rounded-xl border-2 border-dashed border-field bg-paper px-4 py-6 text-center hover:border-accent has-[:focus-visible]:border-accent has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent">
         <span className="sr-only">{t("file")}</span>

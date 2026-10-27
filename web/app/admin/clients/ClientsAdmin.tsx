@@ -69,10 +69,12 @@ export default function ClientsAdmin({ clients }: { clients: Client[] }) {
         </button>
       </div>
       {error && <p role="alert" className={field.error}>{error}</p>}
-      {/* md:overflow-visible: the row menu would be clipped by the wrapper's scroll box; phones keep the sideways scroll. */}
-      <div className={cx(table.wrap, "md:overflow-visible")}>
+      {/* md:overflow-visible: the row menu would be clipped by the wrapper's scroll box; phones keep the sideways scroll.
+          `relative` keeps the sr-only Actions heading inside that scroll box.
+          The header's clip-path keeps its tint inside the card's rounded top corners, which overflow no longer clips. */}
+      <div className={cx(table.wrap, "relative md:overflow-visible")}>
         <table className={table.table}>
-          <thead className={table.head}>
+          <thead className={cx(table.head, "[clip-path:inset(0_round_17px_17px_0_0)]")}>
             <tr>
               <th className={table.th}>{t("name")}</th>
               <th className={table.th}>{t("code")}</th>
