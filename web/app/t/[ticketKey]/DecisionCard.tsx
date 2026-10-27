@@ -87,15 +87,15 @@ export default function DecisionCard({ ticketKey, decision, canEdit }: { ticketK
       ) : (
         // What changed leads; why and the rejected alternatives sit side by side under a thin line.
         <dl className="grid gap-y-3.5 md:grid-cols-2">
-          <div className="md:col-span-2">
+          <div className="min-w-0 md:col-span-2">
             <dt className={label}>{whatLabel}</dt>
             <dd className="mb-1 mt-1 whitespace-pre-wrap break-words text-[20px] font-bold leading-[1.4] tracking-[-0.01em] [text-wrap:pretty]">{decision.what_changed || "—"}</dd>
           </div>
-          <div className="border-t border-line-soft pt-3.5 md:pr-3.5">
+          <div className="min-w-0 border-t border-line-soft pt-3.5 md:pr-3.5">
             <dt className={label}>{t("why")}</dt>
             <dd className="mt-1.5 whitespace-pre-wrap break-words text-sm leading-[1.55] text-ink-soft">{decision.why || "—"}</dd>
           </div>
-          <div className="border-t border-line-soft pt-3.5 md:pl-3.5">
+          <div className="min-w-0 border-t border-line-soft pt-3.5 md:pl-3.5">
             <dt className={label}>{t("alternatives")}</dt>
             <dd className="mt-1.5 whitespace-pre-wrap break-words text-sm leading-[1.55] text-ink-soft">{decision.alternatives || "—"}</dd>
           </div>

@@ -177,9 +177,17 @@ test("editing a ticket keeps one raised surface", async ({ page }) => {
 });
 
 test("ticket page has no sideways scroll at 1440 and 375", async ({ page }) => {
-  const { ticket, attach } = await start(page);
+  const { ticket, attach, call, key, node } = await start(page);
   const a = await ticket("x".repeat(120), { reason });
   await attach(a.key, file);
+  // A closed ticket whose reason and decision record each hold one long unbroken URL.
+  const url = `https://example.com/${"a".repeat(100)}`;
+  const b = await ticket("Overtime rules link", { reason: `See ${url}` });
+  const done = (await call("GET", `/projects/${key}/statuses`)).items.find((s: { name: string }) => s.name === "Done");
+  await call("POST", `/tickets/${b.key}/transition`, {
+    status_id: done.id, reason: `See ${url}`, node_ids: [node],
+    decision: { what_changed: `Rules at ${url}`, why: `Asked in ${url}`, alternatives: `Rejected ${url}` },
+  });
 
   await page.goto(`/t/${a.key}`);
   // A cut name carries the whole name, so nothing is lost to the ellipsis.
@@ -187,6 +195,12 @@ test("ticket page has no sideways scroll at 1440 and 375", async ({ page }) => {
   for (const width of [1440, 375]) {
     await page.setViewportSize({ width, height: 900 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${width}px`).toBe(true);
+  }
+  await page.goto(`/t/${b.key}`);
+  await expect(page.getByRole("region", { name: "Catatan keputusan" })).toContainText(url);
+  for (const width of [1440, 375]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${b.key} at ${width}px`).toBe(true);
   }
 });
 
