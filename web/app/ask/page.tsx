@@ -84,7 +84,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
                   aria-current={th.id === threadId ? "page" : undefined}
                   title={th.title}
                   className={cx(
-                    "block truncate rounded-xl px-3 py-2.5 no-underline",
+                    "block truncate rounded-xl px-3 py-2.5 no-underline transition-colors duration-150",
                     th.id === threadId
                       ? "bg-white font-bold text-ink shadow-[0_1px_2px_rgba(43,36,32,0.08),0_0_0_1px_rgba(43,36,32,0.05)] hover:text-ink"
                       : "font-medium text-ink-soft hover:bg-white/70 hover:text-ink",

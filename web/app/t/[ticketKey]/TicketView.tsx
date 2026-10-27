@@ -170,7 +170,7 @@ export default function TicketView({ ticket, statuses, clients, nodes, assignees
               <section aria-labelledby="reason-title" className={raiseReason ? cx(raised, "px-6 py-5.5") : "mb-5 max-w-[64ch]"}>
                 <div className="mb-1.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-1 text-[12.5px] text-muted">
                   <h2 id="reason-title" className="font-semibold">{t("reason")}</h2>
-                  <span>
+                  <span className="min-w-0 break-words">
                     {t("requestedBy")} {ticket.requester.name}{ticket.requester.title ? ` (${ticket.requester.title})` : ""}
                   </span>
                 </div>

@@ -100,7 +100,7 @@ export default async function StatusPage({ params, searchParams }: {
                   {found[i].items.map((it) => (
                     // A phone stacks the detail under the title; a printed title wraps rather than being cut.
                     <li key={it.id} className="grid grid-cols-[96px_minmax(0,1fr)] items-baseline gap-x-3.5 gap-y-0.5 border-b border-line-soft py-2.5 text-[13px] last:border-b-0 sm:grid-cols-[96px_minmax(0,1fr)_auto]">
-                      <Link href={`/t/${it.key}`} className="font-mono font-semibold">{it.key}</Link>
+                      <Link href={`/t/${it.key}`} title={it.key} className="truncate font-mono font-semibold">{it.key}</Link>
                       <span title={it.title} className="truncate print:overflow-visible print:whitespace-normal print:[overflow-wrap:anywhere]">{it.title}</span>
                       <span className="col-start-2 text-muted sm:col-start-auto sm:max-w-sm sm:text-right">{line(it)}</span>
                     </li>

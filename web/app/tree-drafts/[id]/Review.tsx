@@ -114,7 +114,7 @@ export default function Review({ initial, projectKey, sections }: { initial: Dra
     return (
       <div className={cx(raised, "flex max-w-xl flex-col gap-3 p-6")} role="status">
         <div className="flex items-center gap-3">
-          <span className="flex size-10 shrink-0 animate-pulse items-center justify-center rounded-full bg-accent-soft text-accent">
+          <span className="flex size-10 shrink-0 animate-pulse items-center justify-center rounded-full bg-accent-soft text-accent motion-reduce:animate-none">
             <Icon name="sparkle" className="size-5" />
           </span>
           <p className="text-sm font-semibold">

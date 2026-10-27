@@ -95,7 +95,7 @@ export default async function TicketFilters({ action, values, clients, assignees
                 href={viewHref(action, values, v)}
                 aria-current={lit ? "true" : undefined}
                 className={cx(
-                  "flex h-[30px] shrink-0 items-center rounded-lg px-3 text-[13px] no-underline",
+                  "flex h-[30px] shrink-0 items-center rounded-lg px-3 text-[13px] no-underline focus-visible:-outline-offset-2",
                   lit ? "bg-white font-bold text-ink shadow-[0_1px_2px_rgba(43,36,32,0.1)] hover:text-ink" : "font-semibold text-ink-soft hover:text-ink",
                 )}
               >

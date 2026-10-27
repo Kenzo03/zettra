@@ -228,7 +228,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
                   {items.map((it) => {
                     const overdue = Boolean(it.due_date && it.due_date < today);
                     return (
-                      <li key={it.key} className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line-soft px-3 py-3 first:border-t-0 hover:bg-paper">
+                      <li key={it.key} className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line-soft px-3 py-3 transition-colors duration-150 first:border-t-0 hover:bg-paper">
                         <span className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-well">
                           <TypeIcon type={it.type} label={tTypes(it.type)} className="size-4" />
                         </span>
@@ -236,7 +236,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
                         <div className="flex min-w-0 flex-[1_1_16rem] flex-col gap-0.5">
                           <Link href={`/t/${it.key}`} title={it.title} className="truncate text-[14.5px] font-bold text-ink no-underline hover:text-ink hover:underline">{it.title}</Link>
                           <span className="flex flex-wrap items-center gap-x-2.5 text-[12.5px] text-muted">
-                            <Link href={`/t/${it.key}`} className="font-bold text-muted no-underline hover:text-ink">{it.key}</Link>
+                            <Link href={`/t/${it.key}`} className="font-bold text-muted no-underline transition-colors duration-150 hover:text-ink">{it.key}</Link>
                             {(it.missing_reason || it.missing_menus) && (
                               <span role="img" title={t("missing")} aria-label={t("missing")} className="size-[7px] rounded-full bg-[#D97706]" />
                             )}

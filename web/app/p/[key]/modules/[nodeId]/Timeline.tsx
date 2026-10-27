@@ -64,7 +64,8 @@ export default async function Timeline({ items, notes, sections, failed, more, l
   const control = "h-full cursor-pointer rounded-[10px] bg-transparent text-[13.5px] font-medium text-muted outline-none";
   // Entries sit on the page as ruled rows; the one raised card is the newest closed
   // ticket whose decision still stands. Without one, nothing is raised.
-  const flat = "break-words border-b border-line pb-4 pt-4";
+  const rule = "break-words border-b border-line pb-4";
+  const flat = cx(rule, "pt-4");
   const raisedKey = closedTickets.find((it) => it.decision && !it.decision.superseded_by)?.key;
 
   return (
@@ -123,10 +124,10 @@ export default async function Timeline({ items, notes, sections, failed, more, l
                     <Rail color={it.status.color} open />
                     <article
                       aria-label={`${it.key} ${it.title}`}
-                      className="mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 border-b border-line pb-4 pt-3 text-[13px]"
+                      className={cx(rule, "mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 pt-3 text-[13px]")}
                     >
                       <Link href={`/t/${it.key}`} className="font-bold text-muted no-underline hover:text-ink">{it.key}</Link>
-                      <Link href={`/t/${it.key}`} className="text-[14.5px] font-bold text-ink no-underline hover:text-ink hover:underline">{it.title}</Link>
+                      <Link href={`/t/${it.key}`} className="min-w-0 text-[14.5px] font-bold text-ink no-underline hover:text-ink hover:underline">{it.title}</Link>
                       {withClients && <ClientChip client={it.client} coreLabel={t("core")} />}
                       <span className="text-muted">{requester(it)}</span>
                       <span className="ml-auto flex items-center gap-1.5 font-semibold text-ink-soft">

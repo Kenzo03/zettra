@@ -29,12 +29,16 @@ export default function AutoApplyForm({ action, values, children, ...props }: Pr
   }
 
   // A select tied to the form from elsewhere on the page (form="…", the list's
-  // Sort) applies too; its change event never reaches the form. The page's
-  // action and router never change, so the first render's apply will do.
+  // Sort) applies too; its change event never reaches the form. The listener
+  // is bound once, so it reads the latest apply (and so the latest action) through a ref.
+  const latest = useRef(apply);
+  useEffect(() => {
+    latest.current = apply;
+  });
   useEffect(() => {
     const onChange = (e: Event) => {
       const f = form.current;
-      if (f && e.target instanceof HTMLSelectElement && e.target.form === f && !f.contains(e.target)) apply(f);
+      if (f && e.target instanceof HTMLSelectElement && e.target.form === f && !f.contains(e.target)) latest.current(f);
     };
     document.addEventListener("change", onChange);
     return () => document.removeEventListener("change", onChange);

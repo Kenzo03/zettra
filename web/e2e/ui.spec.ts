@@ -202,6 +202,19 @@ test("ticket page has no sideways scroll at 1440 and 375", async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${b.key} at ${width}px`).toBe(true);
   }
+
+  // A requester name with no space in it wraps, and so does an open ticket's long title on its menu's timeline.
+  const requester = await call("POST", "/contacts", { name: `R${"q".repeat(150)}` });
+  const c = await ticket("Overtime requested by a long name", { reason, requester_contact_id: requester.id });
+  const menu = await call("POST", `/projects/${key}/nodes`, { type: "menu", name: `Long Title ${Date.now().toString(36)}` });
+  const d = await ticket("x".repeat(120), { reason, node_ids: [menu.id] });
+  await page.setViewportSize({ width: 375, height: 900 });
+  await page.goto(`/t/${c.key}`);
+  await expect(page.getByText(`Diminta oleh ${requester.name}`)).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${c.key} at 375px`).toBe(true);
+  await page.goto(`/p/${key}/modules/${menu.id}`);
+  await expect(page.getByRole("article", { name: new RegExp(`^${d.key} `) })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "timeline at 375px").toBe(true);
 });
 
 test("sign-in has no card and shows the tagline", async ({ page }) => {
