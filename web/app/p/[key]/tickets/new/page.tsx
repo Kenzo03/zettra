@@ -4,7 +4,6 @@ import { getTranslations } from "next-intl/server";
 import Icon from "@/components/Icon";
 import PageBar from "@/components/PageBar";
 import TicketForm from "@/components/TicketForm";
-import { panel } from "@/lib/ui";
 import { newTicketData, prefill, type NewTicketParams } from "./data";
 
 export default async function NewTicketPage({
@@ -38,7 +37,8 @@ export default async function NewTicketPage({
         {project.role === "viewer" ? (
           <p className="text-muted">{t("viewersCannot")}</p>
         ) : (
-          <div className={`${panel} max-w-[820px]`}>
+          // The form carries its own inset for the dialog; on a phone it spans the screen so the fields keep the width.
+          <div className="-mx-4 max-w-[820px] md:mx-0">
             <TicketForm
               projectKey={key}
               clients={clients}

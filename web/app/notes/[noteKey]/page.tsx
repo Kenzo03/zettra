@@ -78,7 +78,7 @@ export default async function NotePage({ params, searchParams }: {
       </PageBar>
       <main className="flex flex-col gap-4 px-4 py-4 md:px-5">
         {editing ? (
-          <div className={raised}>{form}</div>
+          <div className={cx(raised, "p-4")}>{form}</div>
         ) : (
           <>
             <div className="flex flex-col gap-2">

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { api } from "@/lib/api";
 import { useProblemText, type Project } from "@/lib/problem";
-import { button, cx, field, panel } from "@/lib/ui";
+import { button, cx, field, section } from "@/lib/ui";
 
 export default function ProjectForm({ project }: { project: Project }) {
   const t = useTranslations("settings");
@@ -27,8 +27,8 @@ export default function ProjectForm({ project }: { project: Project }) {
   }
 
   return (
-    <form aria-label={t("general")} onSubmit={onSubmit} className={cx(panel, "flex flex-col gap-3 p-4")}>
-      <h2 className="text-sm font-semibold">{t("general")}</h2>
+    <form aria-label={t("general")} onSubmit={onSubmit} className={cx(section, "flex flex-col gap-3")}>
+      <h2 className="text-base font-extrabold">{t("general")}</h2>
       <div className="grid gap-3 sm:grid-cols-[160px_minmax(0,1fr)]">
         <label className={field.label}>
           {t("key")}

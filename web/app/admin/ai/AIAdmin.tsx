@@ -6,7 +6,7 @@ import { useLocale, useTimeZone, useTranslations } from "next-intl";
 import { api } from "@/lib/api";
 import { dateTime } from "@/lib/format";
 import { useProblemText, type AIMode, type AISettings, type AITestResult, type IndexStatus, type Problem } from "@/lib/problem";
-import { button, cx, field, panel, sectionTitle, table } from "@/lib/ui";
+import { button, cx, field, section, sectionTitle, table } from "@/lib/ui";
 
 type Endpoint = { url: string; model: string; key: string; clearKey: boolean };
 
@@ -143,9 +143,9 @@ export default function AIAdmin({ settings, status }: { settings: AISettings; st
   );
 
   return (
-    <div className="flex flex-col gap-4">
-      <section aria-labelledby="ai-mode" className={cx(panel, "flex flex-col gap-3 p-4")}>
-        <h2 id="ai-mode" className="text-sm font-semibold">{t("mode")}</h2>
+    <div>
+      <section aria-labelledby="ai-mode" className={cx(section, "flex flex-col gap-3")}>
+        <h2 id="ai-mode" className="text-base font-extrabold">{t("mode")}</h2>
         <div role="radiogroup" aria-labelledby="ai-mode" className="grid gap-2 md:grid-cols-3">
           {(["off", "local", "byok"] as const).map((m) => (
             <label key={m} htmlFor={`${id}-mode-${m}`} className={cx("flex cursor-pointer flex-col gap-1 rounded border p-3 text-[13px]", mode === m ? "border-accent bg-accent-soft" : "border-line")}>
@@ -184,7 +184,7 @@ export default function AIAdmin({ settings, status }: { settings: AISettings; st
         )}
       </section>
 
-      <section aria-label={t("endpoints")} className={cx(panel, "grid gap-6 p-4 md:grid-cols-2")}>
+      <section aria-label={t("endpoints")} className={cx(section, "grid gap-6 md:grid-cols-2")}>
         {endpointFields("chat", chat, setChat, settings.chat.api_key_set)}
         {endpointFields("embed", embed, setEmbed, settings.embed.api_key_set)}
         <details className="md:col-span-2">
@@ -200,7 +200,7 @@ export default function AIAdmin({ settings, status }: { settings: AISettings; st
         </details>
       </section>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="mt-5 flex flex-wrap items-center gap-2">
         <button type="button" disabled={busy} onClick={() => save()} className={button.primary}>{t("save")}</button>
         <button type="button" disabled={busy || mode === "off"} onClick={testConnection} className={button.secondary}>{t("test")}</button>
         {notice && <p role="status" className="text-[13px] text-ok">{notice}</p>}
@@ -208,7 +208,7 @@ export default function AIAdmin({ settings, status }: { settings: AISettings; st
       </div>
 
       {test && (
-        <section aria-label={t("testResult")} className={cx(panel, "grid gap-3 p-4 text-[13px] md:grid-cols-2")}>
+        <section aria-label={t("testResult")} className={cx(section, "grid gap-3 text-[13px] md:grid-cols-2")}>
           {(["chat", "embed"] as const).map((k) => (
             <div key={k} className="flex flex-col gap-1">
               <span className="font-semibold">{t(k)}: {test[k].ok ? t("ok", { ms: test[k].latency_ms }) : t("failed")}</span>
@@ -220,9 +220,9 @@ export default function AIAdmin({ settings, status }: { settings: AISettings; st
         </section>
       )}
 
-      <section aria-labelledby="index-status" className={cx(panel, "flex flex-col gap-3 p-4")}>
+      <section aria-labelledby="index-status" className={cx(section, "flex flex-col gap-3")}>
         <div className="flex flex-wrap items-center gap-2">
-          <h2 id="index-status" className="text-sm font-semibold">{t("indexStatus")}</h2>
+          <h2 id="index-status" className="text-base font-extrabold">{t("indexStatus")}</h2>
           <button type="button" onClick={() => reindex("all")} className={cx(button.secondary, "ml-auto")}>{t("reindexAll")}</button>
         </div>
         <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-[13px]">
@@ -236,7 +236,7 @@ export default function AIAdmin({ settings, status }: { settings: AISettings; st
           <dd>{status.last_indexed_at ? dateTime(status.last_indexed_at, locale, timeZone) : "—"}</dd>
         </dl>
         {status.chunks_by_model.length > 0 && (
-          <div className={table.wrap}>
+          <div className={table.plain}>
             <table className={table.table}>
               <thead className={table.head}>
                 <tr>

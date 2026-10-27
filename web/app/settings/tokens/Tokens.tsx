@@ -7,7 +7,7 @@ import { api } from "@/lib/api";
 import type { components } from "@/lib/api-types";
 import { dateTime } from "@/lib/format";
 import { useProblemText } from "@/lib/problem";
-import { button, cx, field, panel, table } from "@/lib/ui";
+import { button, cx, field, table } from "@/lib/ui";
 
 type APIToken = components["schemas"]["APIToken"];
 
@@ -65,7 +65,7 @@ export default function Tokens({ tokens }: { tokens: APIToken[] }) {
           </button>
         </div>
       )}
-      <form onSubmit={create} aria-label={t("new")} className={cx(panel, "flex flex-wrap items-end gap-3 p-4")}>
+      <form onSubmit={create} aria-label={t("new")} className="flex flex-wrap items-end gap-3">
         <label className={field.label}>
           {t("name")}
           <input name="name" required maxLength={100} placeholder={t("namePlaceholder")} className={field.input} />
@@ -87,7 +87,8 @@ export default function Tokens({ tokens }: { tokens: APIToken[] }) {
       {tokens.length === 0 ? (
         <p className="text-muted">{t("none")}</p>
       ) : (
-        <div className={table.wrap}>
+        // `relative` keeps the sr-only Revoke heading inside the scroll box, so it cannot widen a phone page.
+        <div className={cx(table.plain, "relative")}>
           <table className={table.table}>
             <thead className={table.head}>
               <tr>

@@ -79,7 +79,7 @@ export default async function HandoverPage({ params, searchParams }: {
         {nodes.map((n) => {
           const H = n.depth === 0 ? "h2" : "h3";
           return (
-            <section key={n.id} aria-labelledby={`node-${n.id}`} className={cx("flex flex-col gap-2 break-inside-avoid", n.depth > 0 && "border-l-2 border-line-soft pl-4", n.depth === 2 && "ml-4", n.depth > 2 && "ml-8")}>
+            <section key={n.id} aria-labelledby={`node-${n.id}`} className={cx("flex flex-col gap-2 break-inside-avoid break-words", n.depth > 0 && "border-l-2 border-line-soft pl-4", n.depth === 2 && "ml-4", n.depth > 2 && "ml-8")}>
               <H id={`node-${n.id}`} className={n.depth === 0 ? "text-lg font-extrabold" : "text-[15px] font-bold"}>
                 <Link href={`/p/${key}/modules/${n.id}`} className="text-ink no-underline hover:underline">{name(n)}</Link>
               </H>

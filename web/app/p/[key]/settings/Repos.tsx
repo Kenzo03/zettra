@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { api } from "@/lib/api";
 import type { components } from "@/lib/api-types";
 import { useProblemText } from "@/lib/problem";
-import { button, cx, field, panel, sectionTitle, table } from "@/lib/ui";
+import { button, cx, field, section, table } from "@/lib/ui";
 
 type Repo = components["schemas"]["Repo"];
 type Provider = components["schemas"]["RepoProvider"];
@@ -57,9 +57,11 @@ export default function Repos({ projectKey, repos }: { projectKey: string; repos
   }
 
   return (
-    <section aria-labelledby="repos-title" className={cx(panel, "flex flex-col gap-3 p-4")}>
-      <h2 id="repos-title" className={sectionTitle}>{t("title")}</h2>
-      <p className="text-[13px] text-muted">{t("intro", { example: `${projectKey}-123` })}</p>
+    <section aria-labelledby="repos-title" className={cx(section, "flex flex-col gap-3")}>
+      <div>
+        <h2 id="repos-title" className="text-base font-extrabold">{t("title")}</h2>
+        <p className={cx(field.hint, "mt-1")}>{t("intro", { example: `${projectKey}-123` })}</p>
+      </div>
       {shown?.secret && (
         <div role="status" className="flex flex-col gap-2 rounded border border-warn-line bg-warn-soft p-3 text-[13px]">
           <p className="font-semibold text-warn">{t("once", { name: shown.name })}</p>
@@ -74,7 +76,8 @@ export default function Repos({ projectKey, repos }: { projectKey: string; repos
       {repos.length === 0 ? (
         <p className="text-sm text-muted">{t("none")}</p>
       ) : (
-        <div className={table.wrap}>
+        // `relative` keeps the sr-only Actions heading inside the scroll box, so it cannot widen a phone page.
+        <div className={cx(table.plain, "relative")}>
           <table className={table.table}>
             <thead className={table.head}>
               <tr>

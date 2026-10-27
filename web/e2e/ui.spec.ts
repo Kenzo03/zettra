@@ -95,6 +95,19 @@ const routeSweep: { path: string; max: number; min?: number }[] = [
   { path: "/p/{key}/status", max: 0 },
   { path: "/p/{key}/board", max: 0 },
   { path: "/p/{key}/workload", max: 0 },
+  // Settings and form pages raise nothing: each block is a section on the page.
+  { path: "/p/{key}/settings", max: 0 },
+  { path: "/admin/ai", max: 0 },
+  { path: "/admin/system", max: 0 },
+  { path: "/settings/profile", max: 0 },
+  { path: "/settings/tokens", max: 0 },
+  { path: "/projects/new", max: 0 },
+  { path: "/p/{key}/notes/new", max: 0 },
+  { path: "/p/{key}/modules/import", max: 0 },
+  { path: "/p/{key}/closeout", max: 0 },
+  { path: "/p/{key}/handover", max: 0 },
+  { path: "/p/{key}/summaries/new", max: 0 },
+  { path: "/p/{key}/tickets/new", max: 0 }, // the full page, opened by goto; the @modal floats
 ];
 
 test("open ticket raises the Reason and keeps every control", async ({ page }) => {
@@ -424,4 +437,19 @@ test("views, panel and chips follow the URL", async ({ page }) => {
   const boardViews = page.getByRole("group", { name: "Tampilan" });
   await expect(boardViews.getByRole("link", { name: "Hanya milik saya" })).toBeVisible();
   await expect(boardViews.getByRole("link", { name: "Semua yang terbuka" })).toHaveCount(0);
+});
+
+test("archived project banner is a warn strip, not a card", async ({ page }) => {
+  const { call } = await start(page);
+  const run = Date.now().toString(36).toUpperCase();
+  const key = `A${run.slice(-6)}`;
+  await call("POST", "/projects", { key, name: `Archived ${run}` });
+  await call("POST", `/projects/${key}/archive`);
+
+  await page.goto(`/p/${key}/board`);
+  const banner = page.getByRole("status").filter({ hasText: "Proyek ini diarsipkan" });
+  await expect(banner).toBeVisible();
+  await expect(banner).toHaveClass(/bg-warn-soft/);
+  await expect(banner).not.toHaveClass(/shadow-/);
+  await expect(banner.getByRole("button", { name: "Pulihkan proyek" })).toBeVisible();
 });

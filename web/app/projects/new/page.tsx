@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import PageBar from "@/components/PageBar";
 import { getMe, getProjects } from "@/lib/server-api";
-import { panel } from "@/lib/ui";
 import NewProjectForm from "./NewProjectForm";
 
 export default async function NewProjectPage() {
@@ -17,7 +16,7 @@ export default async function NewProjectPage() {
       </PageBar>
       <main className="p-4 md:p-5">
         {me.is_admin ? (
-          <div className={`${panel} max-w-xl p-5`}>
+          <div className="max-w-xl">
             <NewProjectForm templates={projects.map((p) => ({ key: p.key, name: p.name }))} />
           </div>
         ) : (

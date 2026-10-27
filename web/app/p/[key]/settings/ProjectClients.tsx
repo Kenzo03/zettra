@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { api } from "@/lib/api";
 import { useProblemText, type Client } from "@/lib/problem";
-import { button, cx, field, panel } from "@/lib/ui";
+import { button, cx, field, section } from "@/lib/ui";
 
 // Which clients the project serves. Project admins may also create a client
 // here, since /admin/clients is for system admins (FSD §5.1).
@@ -49,9 +49,9 @@ export default function ProjectClients({ projectKey, all, linked }: { projectKey
   }
 
   return (
-    <section aria-labelledby="clients-title" className={cx(panel, "flex flex-col gap-3 p-4")}>
+    <section aria-labelledby="clients-title" className={cx(section, "flex flex-col gap-3")}>
       <div>
-        <h2 id="clients-title" className="text-sm font-semibold">{t("clientsTitle")}</h2>
+        <h2 id="clients-title" className="text-base font-extrabold">{t("clientsTitle")}</h2>
         <p className={field.hint}>{t("clientsHint")}</p>
       </div>
       <form aria-label={t("clientsTitle")} onSubmit={save} className="flex flex-col gap-3">

@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import Icon from "@/components/Icon";
 import { api } from "@/lib/api";
 import { useProblemText, type Status } from "@/lib/problem";
-import { button, cx, field, panel, table } from "@/lib/ui";
+import { button, cx, field, section, table } from "@/lib/ui";
 
 type Row = Pick<Status, "name" | "category" | "color" | "is_default"> & { id?: number };
 
@@ -48,9 +48,9 @@ export default function StatusesForm({ projectKey, statuses }: { projectKey: str
 
   const iconButton = "inline-flex size-7 cursor-pointer items-center justify-center rounded text-muted hover:bg-well hover:text-ink disabled:opacity-30";
   return (
-    <section aria-labelledby="statuses-title" className={cx(panel, "flex flex-col gap-3 p-4")}>
-      <h2 id="statuses-title" className="text-sm font-semibold">{t("title")}</h2>
-      <div className="overflow-x-auto rounded border border-line-soft">
+    <section aria-labelledby="statuses-title" className={cx(section, "flex flex-col gap-3")}>
+      <h2 id="statuses-title" className="text-base font-extrabold">{t("title")}</h2>
+      <div className={table.plain}>
         <table className={table.table}>
           <thead className={table.head}>
             <tr>

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import PageBar from "@/components/PageBar";
 import { getProject, serverApi } from "@/lib/server-api";
-import { cx, panel } from "@/lib/ui";
+import { cx, section } from "@/lib/ui";
 import ProjectClients from "./ProjectClients";
 import ProjectForm from "./ProjectForm";
 import ProjectMembers from "./ProjectMembers";
@@ -47,7 +47,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ key: 
   return (
     <>
       {bar}
-      <main className="mx-auto flex max-w-5xl flex-col gap-4 p-4 md:p-5">
+      <main className="mx-auto w-full max-w-5xl p-4 md:p-5">
         <ProjectForm project={project} />
         <StatusesForm projectKey={key} statuses={statuses.data?.items ?? []} />
         <ProjectClients projectKey={key} all={all.data?.items ?? []} linked={linkedClients} />
@@ -55,9 +55,11 @@ export default async function SettingsPage({ params }: { params: Promise<{ key: 
         <Releases projectKey={key} releases={releases.data?.items ?? []} />
         <Repos projectKey={key} repos={repos.data?.items ?? []} />
         {/* MSL-64: a finished project leaves pickers and Home, read-only until restored. */}
-        <section aria-labelledby="archive-title" className={cx(panel, "flex flex-col items-start gap-2 px-5 py-4")}>
-          <h2 id="archive-title" className="text-base font-extrabold">{ta("title")}</h2>
-          <p className="text-[13px] text-muted">{ta("hint")}</p>
+        <section aria-labelledby="archive-title" className={cx(section, "flex flex-col items-start gap-3")}>
+          <div>
+            <h2 id="archive-title" className="text-base font-extrabold">{ta("title")}</h2>
+            <p className="mt-1 text-[13px] text-muted">{ta("hint")}</p>
+          </div>
           <ArchiveButton projectKey={key} name={project.name} archived={false} />
         </section>
       </main>

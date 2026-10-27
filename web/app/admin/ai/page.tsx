@@ -19,7 +19,7 @@ export default async function AIPage() {
         <h1 className="text-base font-semibold">{t("title")}</h1>
         {settings?.data && <span className="text-[13px] text-muted">{settings.data.mode === "off" ? t("offBadge") : settings.data.badge}</span>}
       </PageBar>
-      <main className="mx-auto max-w-5xl p-4 md:p-5">
+      <main className="mx-auto w-full max-w-5xl p-4 md:p-5">
         {settings?.data && status?.data ? (
           <AIAdmin settings={settings.data} status={status.data} />
         ) : (

@@ -48,7 +48,7 @@ export default function NoteForm({ projectKey, note, clients, nodes }: { project
   }
 
   return (
-    <form onSubmit={save} aria-label={note ? t("editTitle") : t("newTitle")} className="flex flex-col gap-3.5 p-4">
+    <form onSubmit={save} aria-label={note ? t("editTitle") : t("newTitle")} className="flex flex-col gap-3.5">
       <label className={field.label}>
         {t("title")}
         <input name="title" required minLength={5} maxLength={200} defaultValue={note?.title} className={field.input} />
